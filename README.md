@@ -75,7 +75,7 @@ http://localhost:5173/
 
 ---
 
-## 📄 License
+## 📄 Guide
 For reference/guide go to this link : https://www.youtube.com/watch?v=CgkZ7MvWUAA&t=339s
 
 ---
