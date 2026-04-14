@@ -10,6 +10,7 @@ import { useState } from 'react';
 import LandingPage from './pages/LandingPage';
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
+import ForgotPasswordPage from './pages/ForgotPasswordPage';
 import AboutPage from './pages/AboutPage';
 import ContactPage from './pages/ContactPage';
 import DashboardPage from './pages/DashboardPage';
@@ -55,6 +56,9 @@ export default function App() {
       
       case 'register':
         return <RegisterPage onNavigate={navigate} onRegister={handleRegister} />;
+
+      case 'forgot-password':
+        return <ForgotPasswordPage onNavigate={navigate} />;
       
       case 'about':
         return <AboutPage onNavigate={navigate} />;
