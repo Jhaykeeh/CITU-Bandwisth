@@ -11,11 +11,11 @@ export default function Card({ children, style }) {
   return (
     <div
       style={{
-        backgroundColor: COLORS.backgrounds.card,
-        border: `1px solid ${COLORS.gold.border}`,
+        backgroundColor: COLORS.bgCard,
+        border: `1px solid ${COLORS.borderCard}`,
         borderRadius: '12px',
         padding: '24px',
-        boxShadow: '0 4px 12px rgba(0,0,0,0.3)',
+        boxShadow: '0 4px 12px rgba(0,0,0,0.08)',
         fontFamily: FONTS.primary,
         ...style,
       }}

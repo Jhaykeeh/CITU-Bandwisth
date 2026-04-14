@@ -42,10 +42,10 @@ export default function ContactPage({ onNavigate }) {
   const inputStyle = (fieldName) => ({
     width: '100%',
     padding: '12px 16px',
-    backgroundColor: 'rgba(61,8,8,0.6)',
+    backgroundColor: COLORS.bgInput,
     border: `2px solid ${focusedField === fieldName ? COLORS.gold.primary : COLORS.gold.border}`,
     borderRadius: '8px',
-    color: COLORS.text.white,
+    color: COLORS.maroon.card,
     fontFamily: FONTS.primary,
     fontSize: '14px',
     outline: 'none',
@@ -75,11 +75,11 @@ export default function ContactPage({ onNavigate }) {
       </section>
 
       {/* Main Content */}
-      <section style={{ flex: 1, padding: '60px 40px' }}>
+      <section style={{ flex: 1, padding: '60px 40px', backgroundColor: COLORS.bgPage }}>
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '40px', maxWidth: '1200px', margin: '0 auto' }}>
           {/* Left Column - Contact Info */}
           <div>
-            <h2 style={{ fontSize: '28px', fontWeight: 'bold', color: COLORS.text.gold, fontFamily: FONTS.primary, marginBottom: '32px' }}>
+            <h2 style={{ fontSize: '28px', fontWeight: 'bold', color: COLORS.textHeading, fontFamily: FONTS.primary, marginBottom: '32px' }}>
               Get In Touch
             </h2>
 
@@ -91,14 +91,14 @@ export default function ContactPage({ onNavigate }) {
                 { icon: '📧', label: 'Email', value: 'wildconnect@cit.edu' },
                 { icon: '🕒', label: 'Hours', value: 'Mon–Fri 8AM–5PM' },
               ].map((item, idx) => (
-                <Card key={idx} style={{ padding: '20px' }}>
+                <Card key={idx} style={{ padding: '20px', backgroundColor: COLORS.bgSection }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
                     <div style={{ fontSize: '32px' }}>{item.icon}</div>
                     <div>
-                      <p style={{ fontSize: '12px', color: COLORS.text.mutedGold, fontFamily: FONTS.primary, margin: '0 0 4px 0', fontWeight: 'bold' }}>
+                      <p style={{ fontSize: '12px', color: COLORS.textMuted, fontFamily: FONTS.primary, margin: '0 0 4px 0', fontWeight: 'bold' }}>
                         {item.label}
                       </p>
-                      <p style={{ fontSize: '16px', color: COLORS.text.white, fontFamily: FONTS.primary, margin: 0 }}>
+                      <p style={{ fontSize: '16px', color: COLORS.textBody, fontFamily: FONTS.primary, margin: 0 }}>
                         {item.value}
                       </p>
                     </div>
@@ -108,13 +108,13 @@ export default function ContactPage({ onNavigate }) {
             </div>
 
             {/* Campus Map Placeholder */}
-            <Card style={{ height: '250px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <Card style={{ height: '250px', display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: COLORS.bgSection }}>
               <div style={{ textAlign: 'center' }}>
                 <div style={{ fontSize: '48px', marginBottom: '12px' }}>🗺️</div>
-                <p style={{ fontSize: '16px', color: COLORS.text.mutedGold, fontFamily: FONTS.primary, margin: 0 }}>
+                <p style={{ fontSize: '16px', color: COLORS.textMuted, fontFamily: FONTS.primary, margin: 0 }}>
                   Campus Map
                 </p>
-                <p style={{ fontSize: '12px', color: COLORS.text.mutedGold, fontFamily: FONTS.primary, margin: '4px 0 0 0' }}>
+                <p style={{ fontSize: '12px', color: COLORS.textMuted, fontFamily: FONTS.primary, margin: '4px 0 0 0' }}>
                   N. Bacalso Ave, Cebu City
                 </p>
               </div>
@@ -123,17 +123,17 @@ export default function ContactPage({ onNavigate }) {
 
           {/* Right Column - Message Form */}
           <div>
-            <h2 style={{ fontSize: '28px', fontWeight: 'bold', color: COLORS.text.gold, fontFamily: FONTS.primary, marginBottom: '32px' }}>
+            <h2 style={{ fontSize: '28px', fontWeight: 'bold', color: COLORS.textHeading, fontFamily: FONTS.primary, marginBottom: '32px' }}>
               Send Us a Message
             </h2>
 
             {isSubmitted ? (
               <Card style={{ textAlign: 'center', padding: '60px 40px' }}>
                 <div style={{ fontSize: '64px', marginBottom: '24px' }}>✅</div>
-                <h3 style={{ fontSize: '24px', fontWeight: 'bold', color: COLORS.text.gold, fontFamily: FONTS.primary, marginBottom: '16px' }}>
+                <h3 style={{ fontSize: '24px', fontWeight: 'bold', color: COLORS.textHeading, fontFamily: FONTS.primary, marginBottom: '16px' }}>
                   Message Sent Successfully!
                 </h3>
-                <p style={{ fontSize: '16px', color: COLORS.text.white, fontFamily: FONTS.primary, marginBottom: '32px', lineHeight: '1.6' }}>
+                <p style={{ fontSize: '16px', color: COLORS.textBody, fontFamily: FONTS.primary, marginBottom: '32px', lineHeight: '1.6' }}>
                   Thank you for contacting us. We'll get back to you within 24-48 hours.
                 </p>
                 <button
@@ -163,7 +163,7 @@ export default function ContactPage({ onNavigate }) {
                   {/* Name & Email */}
                   <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
                     <div>
-                      <label style={{ display: 'block', color: COLORS.text.gold, fontFamily: FONTS.primary, fontSize: '14px', fontWeight: 'bold', marginBottom: '8px' }}>
+                      <label style={{ display: 'block', color: COLORS.textHeading, fontFamily: FONTS.primary, fontSize: '14px', fontWeight: 'bold', marginBottom: '8px' }}>
                         Name
                       </label>
                       <input
@@ -178,7 +178,7 @@ export default function ContactPage({ onNavigate }) {
                       />
                     </div>
                     <div>
-                      <label style={{ display: 'block', color: COLORS.text.gold, fontFamily: FONTS.primary, fontSize: '14px', fontWeight: 'bold', marginBottom: '8px' }}>
+                      <label style={{ display: 'block', color: COLORS.textHeading, fontFamily: FONTS.primary, fontSize: '14px', fontWeight: 'bold', marginBottom: '8px' }}>
                         Email
                       </label>
                       <input
@@ -196,7 +196,7 @@ export default function ContactPage({ onNavigate }) {
 
                   {/* Subject */}
                   <div>
-                    <label style={{ display: 'block', color: COLORS.text.gold, fontFamily: FONTS.primary, fontSize: '14px', fontWeight: 'bold', marginBottom: '8px' }}>
+                    <label style={{ display: 'block', color: COLORS.textHeading, fontFamily: FONTS.primary, fontSize: '14px', fontWeight: 'bold', marginBottom: '8px' }}>
                       Subject
                     </label>
                     <select
@@ -215,7 +215,7 @@ export default function ContactPage({ onNavigate }) {
 
                   {/* Message */}
                   <div>
-                    <label style={{ display: 'block', color: COLORS.text.gold, fontFamily: FONTS.primary, fontSize: '14px', fontWeight: 'bold', marginBottom: '8px' }}>
+                    <label style={{ display: 'block', color: COLORS.textHeading, fontFamily: FONTS.primary, fontSize: '14px', fontWeight: 'bold', marginBottom: '8px' }}>
                       Message
                     </label>
                     <textarea

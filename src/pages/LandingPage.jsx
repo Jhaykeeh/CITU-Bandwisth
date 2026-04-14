@@ -144,13 +144,13 @@ export default function LandingPage({ onNavigate }) {
       </section>
 
       {/* Features Section */}
-      <section style={{ padding: '80px 40px', flex: 1 }}>
+      <section style={{ padding: '80px 40px', flex: 1, backgroundColor: COLORS.bgPage }}>
         <h2
           style={{
             textAlign: 'center',
             fontSize: '36px',
             fontWeight: 'bold',
-            color: COLORS.text.gold,
+            color: COLORS.textHeading,
             fontFamily: FONTS.primary,
             marginBottom: '60px',
           }}
@@ -170,10 +170,10 @@ export default function LandingPage({ onNavigate }) {
             <Card key={idx}>
               <div style={{ textAlign: 'center' }}>
                 <div style={{ fontSize: '48px', marginBottom: '16px' }}>{feature.icon}</div>
-                <h3 style={{ fontSize: '20px', fontWeight: 'bold', color: COLORS.text.gold, fontFamily: FONTS.primary, marginBottom: '12px' }}>
+                <h3 style={{ fontSize: '20px', fontWeight: 'bold', color: COLORS.textHeading, fontFamily: FONTS.primary, marginBottom: '12px' }}>
                   {feature.title}
                 </h3>
-                <p style={{ fontSize: '14px', color: COLORS.text.white, fontFamily: FONTS.primary, lineHeight: '1.6' }}>
+                <p style={{ fontSize: '14px', color: COLORS.textBody, fontFamily: FONTS.primary, lineHeight: '1.6' }}>
                   {feature.desc}
                 </p>
               </div>
