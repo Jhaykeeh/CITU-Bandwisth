@@ -83,21 +83,21 @@ export default function LoginPage({ onNavigate, onLogin }) {
         {/* Right Form Panel */}
         <div
           style={{
-            backgroundColor: COLORS.maroon.card,
+            backgroundColor: COLORS.bgPage,
             padding: '60px',
             display: 'flex',
             flexDirection: 'column',
             justifyContent: 'center',
           }}
         >
-          <h2 style={{ fontSize: '28px', fontWeight: 'bold', color: COLORS.text.gold, fontFamily: FONTS.primary, marginBottom: '32px' }}>
+          <h2 style={{ fontSize: '28px', fontWeight: 'bold', color: COLORS.textHeading, fontFamily: FONTS.primary, marginBottom: '32px' }}>
             Log In
           </h2>
 
           <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
             {/* School ID Field */}
             <div>
-              <label style={{ display: 'block', color: COLORS.text.gold, fontFamily: FONTS.primary, fontSize: '14px', fontWeight: 'bold', marginBottom: '8px' }}>
+              <label style={{ display: 'block', color: COLORS.textHeading, fontFamily: FONTS.primary, fontSize: '14px', fontWeight: 'bold', marginBottom: '8px' }}>
                 School ID
               </label>
               <input
@@ -109,10 +109,10 @@ export default function LoginPage({ onNavigate, onLogin }) {
                 style={{
                   width: '100%',
                   padding: '12px 16px',
-                  backgroundColor: 'rgba(61,8,8,0.6)',
+                  backgroundColor: COLORS.bgInput,
                   border: `2px solid ${errors.schoolId ? '#ff4444' : focusedField === 'schoolId' ? COLORS.gold.primary : COLORS.gold.border}`,
                   borderRadius: '8px',
-                  color: COLORS.text.white,
+                  color: COLORS.maroon.card,
                   fontFamily: FONTS.mono,
                   fontSize: '16px',
                   outline: 'none',
@@ -129,7 +129,7 @@ export default function LoginPage({ onNavigate, onLogin }) {
 
             {/* Password Field */}
             <div>
-              <label style={{ display: 'block', color: COLORS.text.gold, fontFamily: FONTS.primary, fontSize: '14px', fontWeight: 'bold', marginBottom: '8px' }}>
+              <label style={{ display: 'block', color: COLORS.textHeading, fontFamily: FONTS.primary, fontSize: '14px', fontWeight: 'bold', marginBottom: '8px' }}>
                 Password
               </label>
               <div style={{ position: 'relative' }}>
@@ -142,10 +142,10 @@ export default function LoginPage({ onNavigate, onLogin }) {
                   style={{
                     width: '100%',
                     padding: '12px 48px 12px 16px',
-                    backgroundColor: 'rgba(61,8,8,0.6)',
+                    backgroundColor: COLORS.bgInput,
                     border: `2px solid ${errors.password ? '#ff4444' : focusedField === 'password' ? COLORS.gold.primary : COLORS.gold.border}`,
                     borderRadius: '8px',
-                    color: COLORS.text.white,
+                    color: COLORS.maroon.card,
                     fontFamily: FONTS.mono,
                     fontSize: '16px',
                     outline: 'none',
@@ -222,7 +222,7 @@ export default function LoginPage({ onNavigate, onLogin }) {
           </form>
 
           {/* Register Link */}
-          <p style={{ textAlign: 'center', marginTop: '24px', color: COLORS.text.white, fontFamily: FONTS.primary, fontSize: '14px' }}>
+          <p style={{ textAlign: 'center', marginTop: '24px', color: COLORS.textBody, fontFamily: FONTS.primary, fontSize: '14px' }}>
             Don't have an account?{' '}
             <button
               onClick={() => onNavigate('register')}

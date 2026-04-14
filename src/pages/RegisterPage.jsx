@@ -80,10 +80,10 @@ export default function RegisterPage({ onNavigate, onRegister }) {
   const inputStyle = (fieldName) => ({
     width: '100%',
     padding: '12px 16px',
-    backgroundColor: 'rgba(61,8,8,0.6)',
+    backgroundColor: COLORS.bgInput,
     border: `2px solid ${errors[fieldName] ? '#ff4444' : focusedField === fieldName ? COLORS.gold.primary : COLORS.gold.border}`,
     borderRadius: '8px',
-    color: COLORS.text.white,
+    color: COLORS.maroon.card,
     fontFamily: fieldName === 'schoolId' ? FONTS.mono : FONTS.primary,
     fontSize: '14px',
     outline: 'none',
@@ -103,6 +103,7 @@ export default function RegisterPage({ onNavigate, onRegister }) {
           alignItems: 'center',
           justifyContent: 'center',
           padding: '60px 40px',
+          backgroundColor: COLORS.bgPage,
         }}
       >
         <Card style={{ width: '100%', maxWidth: '700px', padding: '0' }}>
@@ -129,7 +130,7 @@ export default function RegisterPage({ onNavigate, onRegister }) {
               {/* First Name & Last Name */}
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
                 <div>
-                  <label style={{ display: 'block', color: COLORS.text.gold, fontFamily: FONTS.primary, fontSize: '14px', fontWeight: 'bold', marginBottom: '8px' }}>
+                  <label style={{ display: 'block', color: COLORS.textHeading, fontFamily: FONTS.primary, fontSize: '14px', fontWeight: 'bold', marginBottom: '8px' }}>
                     First Name
                   </label>
                   <input
@@ -148,7 +149,7 @@ export default function RegisterPage({ onNavigate, onRegister }) {
                   )}
                 </div>
                 <div>
-                  <label style={{ display: 'block', color: COLORS.text.gold, fontFamily: FONTS.primary, fontSize: '14px', fontWeight: 'bold', marginBottom: '8px' }}>
+                  <label style={{ display: 'block', color: COLORS.textHeading, fontFamily: FONTS.primary, fontSize: '14px', fontWeight: 'bold', marginBottom: '8px' }}>
                     Last Name
                   </label>
                   <input
@@ -168,9 +169,9 @@ export default function RegisterPage({ onNavigate, onRegister }) {
                 </div>
               </div>
 
-              {/* School ID & Email */}
+              {/* School ID */}
               <div>
-                <label style={{ display: 'block', color: COLORS.text.gold, fontFamily: FONTS.primary, fontSize: '14px', fontWeight: 'bold', marginBottom: '8px' }}>
+                <label style={{ display: 'block', color: COLORS.textHeading, fontFamily: FONTS.primary, fontSize: '14px', fontWeight: 'bold', marginBottom: '8px' }}>
                   School ID
                 </label>
                 <input
@@ -190,7 +191,7 @@ export default function RegisterPage({ onNavigate, onRegister }) {
               </div>
 
               <div>
-                <label style={{ display: 'block', color: COLORS.text.gold, fontFamily: FONTS.primary, fontSize: '14px', fontWeight: 'bold', marginBottom: '8px' }}>
+                <label style={{ display: 'block', color: COLORS.textHeading, fontFamily: FONTS.primary, fontSize: '14px', fontWeight: 'bold', marginBottom: '8px' }}>
                   Email
                 </label>
                 <input
@@ -211,7 +212,7 @@ export default function RegisterPage({ onNavigate, onRegister }) {
 
               {/* Role */}
               <div>
-                <label style={{ display: 'block', color: COLORS.text.gold, fontFamily: FONTS.primary, fontSize: '14px', fontWeight: 'bold', marginBottom: '8px' }}>
+                <label style={{ display: 'block', color: COLORS.textHeading, fontFamily: FONTS.primary, fontSize: '14px', fontWeight: 'bold', marginBottom: '8px' }}>
                   Role
                 </label>
                 <select
@@ -229,7 +230,7 @@ export default function RegisterPage({ onNavigate, onRegister }) {
               {/* Password & Confirm Password */}
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
                 <div>
-                  <label style={{ display: 'block', color: COLORS.text.gold, fontFamily: FONTS.primary, fontSize: '14px', fontWeight: 'bold', marginBottom: '8px' }}>
+                  <label style={{ display: 'block', color: COLORS.textHeading, fontFamily: FONTS.primary, fontSize: '14px', fontWeight: 'bold', marginBottom: '8px' }}>
                     Password
                   </label>
                   <input
@@ -248,7 +249,7 @@ export default function RegisterPage({ onNavigate, onRegister }) {
                   )}
                 </div>
                 <div>
-                  <label style={{ display: 'block', color: COLORS.text.gold, fontFamily: FONTS.primary, fontSize: '14px', fontWeight: 'bold', marginBottom: '8px' }}>
+                  <label style={{ display: 'block', color: COLORS.textHeading, fontFamily: FONTS.primary, fontSize: '14px', fontWeight: 'bold', marginBottom: '8px' }}>
                     Confirm Password
                   </label>
                   <input
@@ -277,7 +278,7 @@ export default function RegisterPage({ onNavigate, onRegister }) {
                   onChange={handleChange}
                   style={{ width: '18px', height: '18px', cursor: 'pointer' }}
                 />
-                <span style={{ color: COLORS.text.white, fontFamily: FONTS.primary, fontSize: '14px' }}>
+                <span style={{ color: COLORS.textBody, fontFamily: FONTS.primary, fontSize: '14px' }}>
                   I agree to the{' '}
                   <span style={{ color: COLORS.text.gold, textDecoration: 'underline', cursor: 'pointer' }}>Terms of Service</span>
                 </span>
@@ -316,7 +317,7 @@ export default function RegisterPage({ onNavigate, onRegister }) {
 
           {/* Login Link */}
           <div style={{ textAlign: 'center', padding: '0 32px 32px 32px' }}>
-            <p style={{ color: COLORS.text.white, fontFamily: FONTS.primary, fontSize: '14px', margin: 0 }}>
+            <p style={{ color: COLORS.textBody, fontFamily: FONTS.primary, fontSize: '14px', margin: 0 }}>
               Already have an account?{' '}
               <button
                 onClick={() => onNavigate('login')}

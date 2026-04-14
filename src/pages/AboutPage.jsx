@@ -32,22 +32,22 @@ export default function AboutPage({ onNavigate }) {
       </section>
 
       {/* Mission & Vision */}
-      <section style={{ padding: '80px 40px' }}>
+      <section style={{ padding: '80px 40px', backgroundColor: COLORS.bgPage }}>
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '30px', maxWidth: '1200px', margin: '0 auto' }}>
           <Card>
-            <h2 style={{ fontSize: '28px', fontWeight: 'bold', color: COLORS.text.gold, fontFamily: FONTS.primary, marginBottom: '16px' }}>
+            <h2 style={{ fontSize: '28px', fontWeight: 'bold', color: COLORS.textHeading, fontFamily: FONTS.primary, marginBottom: '16px' }}>
               🎯 Our Mission
             </h2>
-            <p style={{ fontSize: '16px', color: COLORS.text.white, fontFamily: FONTS.primary, lineHeight: '1.8' }}>
+            <p style={{ fontSize: '16px', color: COLORS.textBody, fontFamily: FONTS.primary, lineHeight: '1.8' }}>
               To provide intelligent bandwidth management solutions that ensure fair, efficient, and reliable network access
               for every member of the CITU community, empowering education through seamless connectivity.
             </p>
           </Card>
           <Card>
-            <h2 style={{ fontSize: '28px', fontWeight: 'bold', color: COLORS.text.gold, fontFamily: FONTS.primary, marginBottom: '16px' }}>
+            <h2 style={{ fontSize: '28px', fontWeight: 'bold', color: COLORS.textHeading, fontFamily: FONTS.primary, marginBottom: '16px' }}>
               👁️ Our Vision
             </h2>
-            <p style={{ fontSize: '16px', color: COLORS.text.white, fontFamily: FONTS.primary, lineHeight: '1.8' }}>
+            <p style={{ fontSize: '16px', color: COLORS.textBody, fontFamily: FONTS.primary, lineHeight: '1.8' }}>
               To become the leading campus network management system in the Philippines, setting the standard for
               equitable bandwidth distribution and real-time network monitoring in educational institutions.
             </p>
@@ -56,8 +56,8 @@ export default function AboutPage({ onNavigate }) {
       </section>
 
       {/* The Problem Section */}
-      <section style={{ padding: '80px 40px', backgroundColor: COLORS.maroon.dark }}>
-        <h2 style={{ textAlign: 'center', fontSize: '36px', fontWeight: 'bold', color: COLORS.text.gold, fontFamily: FONTS.primary, marginBottom: '60px' }}>
+      <section style={{ padding: '80px 40px', backgroundColor: COLORS.bgSection }}>
+        <h2 style={{ textAlign: 'center', fontSize: '36px', fontWeight: 'bold', color: COLORS.textHeading, fontFamily: FONTS.primary, marginBottom: '60px' }}>
           The Problem We Solve
         </h2>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '30px', maxWidth: '1000px', margin: '0 auto' }}>
@@ -66,11 +66,11 @@ export default function AboutPage({ onNavigate }) {
             { stat: '4,000+', desc: 'Students affected by network congestion daily' },
             { stat: '₱2M+', desc: 'Annual cost of network inefficiencies' },
           ].map((item, idx) => (
-            <Card key={idx} style={{ textAlign: 'center' }}>
-              <div style={{ fontSize: '48px', fontWeight: 'bold', color: COLORS.text.gold, fontFamily: FONTS.primary, marginBottom: '12px' }}>
+            <Card key={idx} style={{ textAlign: 'center', backgroundColor: COLORS.bgSection }}>
+              <div style={{ fontSize: '48px', fontWeight: 'bold', color: COLORS.maroon.light, fontFamily: FONTS.primary, marginBottom: '12px' }}>
                 {item.stat}
               </div>
-              <p style={{ fontSize: '16px', color: COLORS.text.white, fontFamily: FONTS.primary, lineHeight: '1.6' }}>
+              <p style={{ fontSize: '16px', color: COLORS.textBody, fontFamily: FONTS.primary, lineHeight: '1.6' }}>
                 {item.desc}
               </p>
             </Card>
@@ -79,8 +79,8 @@ export default function AboutPage({ onNavigate }) {
       </section>
 
       {/* Timeline */}
-      <section style={{ padding: '80px 40px' }}>
-        <h2 style={{ textAlign: 'center', fontSize: '36px', fontWeight: 'bold', color: COLORS.text.gold, fontFamily: FONTS.primary, marginBottom: '60px' }}>
+      <section style={{ padding: '80px 40px', backgroundColor: COLORS.bgPage }}>
+        <h2 style={{ textAlign: 'center', fontSize: '36px', fontWeight: 'bold', color: COLORS.textHeading, fontFamily: FONTS.primary, marginBottom: '60px' }}>
           Our Journey
         </h2>
         <div style={{ maxWidth: '800px', margin: '0 auto', position: 'relative' }}>
@@ -120,13 +120,13 @@ export default function AboutPage({ onNavigate }) {
                 }}
               >
                 <Card>
-                  <div style={{ fontSize: '14px', color: COLORS.text.mutedGold, fontFamily: FONTS.mono, marginBottom: '8px' }}>
+                  <div style={{ fontSize: '14px', color: COLORS.textMuted, fontFamily: FONTS.mono, marginBottom: '8px' }}>
                     {item.year}
                   </div>
-                  <h3 style={{ fontSize: '20px', fontWeight: 'bold', color: COLORS.text.gold, fontFamily: FONTS.primary, marginBottom: '8px' }}>
+                  <h3 style={{ fontSize: '20px', fontWeight: 'bold', color: COLORS.textHeading, fontFamily: FONTS.primary, marginBottom: '8px' }}>
                     {item.title}
                   </h3>
-                  <p style={{ fontSize: '14px', color: COLORS.text.white, fontFamily: FONTS.primary, lineHeight: '1.6', margin: 0 }}>
+                  <p style={{ fontSize: '14px', color: COLORS.textBody, fontFamily: FONTS.primary, lineHeight: '1.6', margin: 0 }}>
                     {item.desc}
                   </p>
                 </Card>
@@ -151,32 +151,32 @@ export default function AboutPage({ onNavigate }) {
       </section>
 
       {/* Team Section */}
-      <section style={{ padding: '80px 40px', backgroundColor: COLORS.maroon.dark }}>
-        <h2 style={{ textAlign: 'center', fontSize: '36px', fontWeight: 'bold', color: COLORS.text.gold, fontFamily: FONTS.primary, marginBottom: '60px' }}>
+      <section style={{ padding: '80px 40px', backgroundColor: COLORS.bgSection }}>
+        <h2 style={{ textAlign: 'center', fontSize: '36px', fontWeight: 'bold', color: COLORS.textHeading, fontFamily: FONTS.primary, marginBottom: '60px' }}>
           Meet the Team
         </h2>
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '30px', maxWidth: '800px', margin: '0 auto' }}>
           <Card style={{ textAlign: 'center' }}>
             <div style={{ fontSize: '64px', marginBottom: '16px' }}>👨‍💻</div>
-            <h3 style={{ fontSize: '22px', fontWeight: 'bold', color: COLORS.text.gold, fontFamily: FONTS.primary, marginBottom: '8px' }}>
+            <h3 style={{ fontSize: '22px', fontWeight: 'bold', color: COLORS.textHeading, fontFamily: FONTS.primary, marginBottom: '8px' }}>
               Judd Kristoffer Mayuela
             </h3>
-            <p style={{ fontSize: '14px', color: COLORS.text.mutedGold, fontFamily: FONTS.primary, marginBottom: '12px' }}>
+            <p style={{ fontSize: '14px', color: COLORS.text.gold, fontFamily: FONTS.primary, marginBottom: '12px', fontWeight: 'bold' }}>
               Lead Developer
             </p>
-            <p style={{ fontSize: '14px', color: COLORS.text.white, fontFamily: FONTS.primary, lineHeight: '1.6' }}>
+            <p style={{ fontSize: '14px', color: COLORS.textBody, fontFamily: FONTS.primary, lineHeight: '1.6' }}>
               Responsible for system architecture, backend integration, and core functionality development.
             </p>
           </Card>
           <Card style={{ textAlign: 'center' }}>
             <div style={{ fontSize: '64px', marginBottom: '16px' }}>🎨</div>
-            <h3 style={{ fontSize: '22px', fontWeight: 'bold', color: COLORS.text.gold, fontFamily: FONTS.primary, marginBottom: '8px' }}>
+            <h3 style={{ fontSize: '22px', fontWeight: 'bold', color: COLORS.textHeading, fontFamily: FONTS.primary, marginBottom: '8px' }}>
               Bryne Kendrick P. Nuñez
             </h3>
-            <p style={{ fontSize: '14px', color: COLORS.text.mutedGold, fontFamily: FONTS.primary, marginBottom: '12px' }}>
+            <p style={{ fontSize: '14px', color: COLORS.text.gold, fontFamily: FONTS.primary, marginBottom: '12px', fontWeight: 'bold' }}>
               UI/UX Developer
             </p>
-            <p style={{ fontSize: '14px', color: COLORS.text.white, fontFamily: FONTS.primary, lineHeight: '1.6' }}>
+            <p style={{ fontSize: '14px', color: COLORS.textBody, fontFamily: FONTS.primary, lineHeight: '1.6' }}>
               Designed user interfaces, user experience flows, and visual identity of WildConnect.
             </p>
           </Card>
@@ -184,14 +184,14 @@ export default function AboutPage({ onNavigate }) {
       </section>
 
       {/* Tech Stack */}
-      <section style={{ padding: '80px 40px' }}>
-        <h2 style={{ textAlign: 'center', fontSize: '36px', fontWeight: 'bold', color: COLORS.text.gold, fontFamily: FONTS.primary, marginBottom: '60px' }}>
+      <section style={{ padding: '80px 40px', backgroundColor: COLORS.bgPage }}>
+        <h2 style={{ textAlign: 'center', fontSize: '36px', fontWeight: 'bold', color: COLORS.textHeading, fontFamily: FONTS.primary, marginBottom: '60px' }}>
           Technology Stack
         </h2>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '24px', maxWidth: '900px', margin: '0 auto' }}>
           {['ReactJS', 'Vite', 'JavaScript', 'CSS-in-JS', 'REST API', 'MySQL'].map((tech, idx) => (
-            <Card key={idx} style={{ textAlign: 'center', padding: '20px' }}>
-              <div style={{ fontSize: '18px', fontWeight: 'bold', color: COLORS.text.gold, fontFamily: FONTS.primary }}>
+            <Card key={idx} style={{ textAlign: 'center', padding: '20px', backgroundColor: COLORS.bgSection }}>
+              <div style={{ fontSize: '18px', fontWeight: 'bold', color: COLORS.textHeading, fontFamily: FONTS.primary }}>
                 {tech}
               </div>
             </Card>

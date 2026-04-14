@@ -28,6 +28,17 @@ export const COLORS = {
     gradient: 'linear-gradient(135deg, #3d0808 0%, #7a1010 100%)',
     card: '#2a0808',
   },
+  
+  // New white-body tokens
+  bgPage: '#ffffff',              // main page background
+  bgSection: '#fdf8f2',           // alternating section background
+  bgCard: '#ffffff',              // card/panel background
+  bgInput: '#ffffff',             // form input background
+  textBody: '#3a3a3a',            // general body text on white
+  textHeading: '#7a1010',         // headings on white backgrounds
+  textMuted: '#777777',           // secondary/muted text on white
+  textPlaceholder: '#aaaaaa',     // input placeholder on white
+  borderCard: 'rgba(212,168,67,0.3)',  // card border
 };
 
 export const FONTS = {

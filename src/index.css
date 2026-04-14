@@ -21,7 +21,7 @@ body {
   padding: 0;
   width: 100%;
   min-height: 100vh;
-  background: linear-gradient(135deg, #3d0808 0%, #7a1010 100%);
+  background: #ffffff;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;

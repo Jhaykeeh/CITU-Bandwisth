@@ -44,7 +44,7 @@ export default function DashboardPage({ onNavigate, onLogout, userName }) {
       />
 
       {/* Main Content */}
-      <div style={{ flex: 1, overflowY: 'auto' }}>
+      <div style={{ flex: 1, overflowY: 'auto', backgroundColor: COLORS.bgSection }}>
         {/* Top Header */}
         <header
           style={{
@@ -77,7 +77,7 @@ export default function DashboardPage({ onNavigate, onLogout, userName }) {
 
         {/* Dashboard Content */}
         <main style={{ padding: '40px' }}>
-          {/* Welcome Banner */}
+          {/* Welcome Banner - Keep maroon gradient */}
           <Card style={{ marginBottom: '32px', background: `linear-gradient(135deg, ${COLORS.maroon.medium} 0%, ${COLORS.maroon.light} 100%)` }}>
             <div style={{ marginBottom: '20px' }}>
               <h2 style={{ fontSize: '28px', fontWeight: 'bold', color: COLORS.text.gold, fontFamily: FONTS.primary, marginBottom: '8px' }}>
@@ -138,7 +138,7 @@ export default function DashboardPage({ onNavigate, onLogout, userName }) {
                 <div style={{ fontSize: '24px', fontWeight: 'bold', color: stat.color, fontFamily: FONTS.primary, marginBottom: '4px' }}>
                   {stat.value}
                 </div>
-                <div style={{ fontSize: '13px', color: COLORS.text.mutedGold, fontFamily: FONTS.primary }}>
+                <div style={{ fontSize: '13px', color: COLORS.textMuted, fontFamily: FONTS.primary }}>
                   {stat.label}
                 </div>
               </Card>
@@ -146,7 +146,7 @@ export default function DashboardPage({ onNavigate, onLogout, userName }) {
           </div>
 
           {/* Quick Access Grid */}
-          <h3 style={{ fontSize: '24px', fontWeight: 'bold', color: COLORS.text.gold, fontFamily: FONTS.primary, marginBottom: '20px' }}>
+          <h3 style={{ fontSize: '24px', fontWeight: 'bold', color: COLORS.textHeading, fontFamily: FONTS.primary, marginBottom: '20px' }}>
             Quick Access
           </h3>
           <div
@@ -173,10 +173,10 @@ export default function DashboardPage({ onNavigate, onLogout, userName }) {
               >
                 <div style={{ textAlign: 'center' }}>
                   <div style={{ fontSize: '40px', marginBottom: '12px' }}>{feature.icon}</div>
-                  <h4 style={{ fontSize: '18px', fontWeight: 'bold', color: COLORS.text.gold, fontFamily: FONTS.primary, marginBottom: '8px' }}>
+                  <h4 style={{ fontSize: '18px', fontWeight: 'bold', color: COLORS.textHeading, fontFamily: FONTS.primary, marginBottom: '8px' }}>
                     {feature.title}
                   </h4>
-                  <p style={{ fontSize: '13px', color: COLORS.text.white, fontFamily: FONTS.primary, lineHeight: '1.5', margin: 0 }}>
+                  <p style={{ fontSize: '13px', color: COLORS.textBody, fontFamily: FONTS.primary, lineHeight: '1.5', margin: 0 }}>
                     {feature.desc}
                   </p>
                 </div>
@@ -185,7 +185,7 @@ export default function DashboardPage({ onNavigate, onLogout, userName }) {
           </div>
 
           {/* Recent Activity */}
-          <h3 style={{ fontSize: '24px', fontWeight: 'bold', color: COLORS.text.gold, fontFamily: FONTS.primary, marginBottom: '20px' }}>
+          <h3 style={{ fontSize: '24px', fontWeight: 'bold', color: COLORS.textHeading, fontFamily: FONTS.primary, marginBottom: '20px' }}>
             Recent Activity
           </h3>
           <Card style={{ padding: '0' }}>
@@ -212,14 +212,14 @@ export default function DashboardPage({ onNavigate, onLogout, userName }) {
                 />
                 <div style={{ flex: 1 }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
-                    <span style={{ fontSize: '16px', fontWeight: 'bold', color: COLORS.text.white, fontFamily: FONTS.primary }}>
+                    <span style={{ fontSize: '16px', fontWeight: 'bold', color: COLORS.textBody, fontFamily: FONTS.primary }}>
                       {activity.event}
                     </span>
-                    <span style={{ fontSize: '12px', color: COLORS.text.mutedGold, fontFamily: FONTS.mono }}>
+                    <span style={{ fontSize: '12px', color: COLORS.textMuted, fontFamily: FONTS.mono }}>
                       {activity.time}
                     </span>
                   </div>
-                  <p style={{ fontSize: '14px', color: COLORS.text.mutedGold, fontFamily: FONTS.primary, margin: 0, lineHeight: '1.5' }}>
+                  <p style={{ fontSize: '14px', color: COLORS.textMuted, fontFamily: FONTS.primary, margin: 0, lineHeight: '1.5' }}>
                     {activity.details}
                   </p>
                 </div>
