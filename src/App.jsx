@@ -14,6 +14,7 @@ import ForgotPasswordPage from './pages/ForgotPasswordPage';
 import AboutPage from './pages/AboutPage';
 import ContactPage from './pages/ContactPage';
 import DashboardPage from './pages/DashboardPage';
+import MyAccountPage from './pages/MyAccountPage';
 
 export default function App() {
   const [currentPage, setCurrentPage] = useState('landing');
@@ -73,6 +74,19 @@ export default function App() {
         }
         return (
           <DashboardPage
+            onNavigate={navigate}
+            onLogout={handleLogout}
+            userName={userName}
+          />
+        );
+
+      case 'my-account':
+        if (!isLoggedIn) {
+          navigate('login');
+          return null;
+        }
+        return (
+          <MyAccountPage
             onNavigate={navigate}
             onLogout={handleLogout}
             userName={userName}

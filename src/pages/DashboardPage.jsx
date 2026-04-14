@@ -15,6 +15,10 @@ export default function DashboardPage({ onNavigate, onLogout, userName }) {
   const [hoveredCard, setHoveredCard] = useState(null);
 
   const handleMenuNavigate = (key) => {
+    if (key === 'my-account') {
+      onNavigate('my-account');
+      return;
+    }
     setActiveMenu(key);
   };
 
