@@ -183,14 +183,15 @@ export default function LoginPage({ onNavigate, onLogin }) {
             <div style={{ textAlign: 'right' }}>
               <button
                 type="button"
+                onClick={() => onNavigate('forgot-password')}
                 style={{
-                  background: 'none',
-                  border: 'none',
-                  color: COLORS.text.gold,
-                  fontFamily: FONTS.primary,
-                  fontSize: '14px',
-                  cursor: 'pointer',
-                  textDecoration: 'underline',
+                background: 'none',
+                border: 'none',
+                color: COLORS.text.gold,
+                fontFamily: FONTS.primary,
+                fontSize: '14px',
+                cursor: 'pointer',
+                textDecoration: 'underline',
                 }}
               >
                 Forgot password?
