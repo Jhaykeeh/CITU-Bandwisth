@@ -15,6 +15,7 @@ import AboutPage from './pages/AboutPage';
 import ContactPage from './pages/ContactPage';
 import DashboardPage from './pages/DashboardPage';
 import MyAccountPage from './pages/MyAccountPage';
+import BandwidthMonitorPage from './pages/BandwidthMonitorPage';
 
 export default function App() {
   const [currentPage, setCurrentPage] = useState('landing');
@@ -87,6 +88,19 @@ export default function App() {
         }
         return (
           <MyAccountPage
+            onNavigate={navigate}
+            onLogout={handleLogout}
+            userName={userName}
+          />
+        );
+
+      case 'bandwidth-monitor':
+        if (!isLoggedIn) {
+          navigate('login');
+          return null;
+        }
+        return (
+          <BandwidthMonitorPage
             onNavigate={navigate}
             onLogout={handleLogout}
             userName={userName}
