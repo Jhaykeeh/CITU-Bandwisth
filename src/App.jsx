@@ -23,6 +23,7 @@ export default function App() {
   const [currentPage, setCurrentPage] = useState('landing');
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [userName, setUserName] = useState('');
+  const [userRole, setUserRole] = useState(''); // 'student' | 'admin'
 
   // Navigation handler
   const navigate = (page) => {
@@ -34,18 +35,21 @@ export default function App() {
   const handleLogin = (userData) => {
     setIsLoggedIn(true);
     setUserName(userData.name || userData.schoolId);
+    setUserRole(userData.role || 'student');
   };
 
   // Register handler
   const handleRegister = (userData) => {
     setIsLoggedIn(true);
     setUserName(userData.name);
+    setUserRole('student');
   };
 
   // Logout handler
   const handleLogout = () => {
     setIsLoggedIn(false);
     setUserName('');
+    setUserRole('');
     navigate('landing');
   };
 
@@ -78,6 +82,7 @@ export default function App() {
             onNavigate={navigate}
             onLogout={handleLogout}
             userName={userName}
+            userRole={userRole}
           />
         );
 
@@ -88,6 +93,7 @@ export default function App() {
             onNavigate={navigate}
             onLogout={handleLogout}
             userName={userName}
+            userRole={userRole}
           />
         );
 
@@ -98,6 +104,7 @@ export default function App() {
             onNavigate={navigate}
             onLogout={handleLogout}
             userName={userName}
+            userRole={userRole}
           />
         );
 
@@ -108,10 +115,12 @@ export default function App() {
             onNavigate={navigate}
             onLogout={handleLogout}
             userName={userName}
+            userRole={userRole}
           />
         );
 
       case 'admin-panel':
+        if (userRole !== 'admin') { navigate('dashboard'); return null; }
         return (
           <AdminDashboardPage
             onNavigate={navigate}

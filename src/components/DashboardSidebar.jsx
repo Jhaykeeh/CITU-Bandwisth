@@ -1,7 +1,7 @@
 /**
  * DashboardSidebar Component
  * 
- * Authenticated left sidebar navigation with 7 menu items from MENU_FEATURES.
+ * Authenticated left sidebar navigation from MENU_FEATURES.
  * Active item highlighted with gold left border. Includes logout button at bottom.
  */
 
