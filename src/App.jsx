@@ -1,6 +1,6 @@
 /**
  * App.jsx - Main Application Router
- * 
+ *
  * Central router/controller for WildConnect application.
  * Manages page state with switch statement rendering.
  * Handles login, register, and logout navigation flows.
@@ -16,6 +16,8 @@ import ContactPage from './pages/ContactPage';
 import DashboardPage from './pages/DashboardPage';
 import MyAccountPage from './pages/MyAccountPage';
 import BandwidthMonitorPage from './pages/BandwidthMonitorPage';
+import WifiRegistrationPage from './pages/WifiRegistrationPage';
+import AdminDashboardPage from './pages/AdminDashboardPage';
 
 export default function App() {
   const [currentPage, setCurrentPage] = useState('landing');
@@ -50,29 +52,27 @@ export default function App() {
   // Page renderer
   const renderPage = () => {
     switch (currentPage) {
+
       case 'landing':
         return <LandingPage onNavigate={navigate} />;
-      
+
       case 'login':
         return <LoginPage onNavigate={navigate} onLogin={handleLogin} />;
-      
+
       case 'register':
         return <RegisterPage onNavigate={navigate} onRegister={handleRegister} />;
 
       case 'forgot-password':
         return <ForgotPasswordPage onNavigate={navigate} />;
-      
+
       case 'about':
         return <AboutPage onNavigate={navigate} />;
-      
+
       case 'contact':
         return <ContactPage onNavigate={navigate} />;
-      
+
       case 'dashboard':
-        if (!isLoggedIn) {
-          navigate('login');
-          return null;
-        }
+        if (!isLoggedIn) { navigate('login'); return null; }
         return (
           <DashboardPage
             onNavigate={navigate}
@@ -82,10 +82,7 @@ export default function App() {
         );
 
       case 'my-account':
-        if (!isLoggedIn) {
-          navigate('login');
-          return null;
-        }
+        if (!isLoggedIn) { navigate('login'); return null; }
         return (
           <MyAccountPage
             onNavigate={navigate}
@@ -95,10 +92,7 @@ export default function App() {
         );
 
       case 'bandwidth-monitor':
-        if (!isLoggedIn) {
-          navigate('login');
-          return null;
-        }
+        if (!isLoggedIn) { navigate('login'); return null; }
         return (
           <BandwidthMonitorPage
             onNavigate={navigate}
@@ -106,7 +100,25 @@ export default function App() {
             userName={userName}
           />
         );
-      
+
+      case 'wifi-registration':
+        if (!isLoggedIn) { navigate('login'); return null; }
+        return (
+          <WifiRegistrationPage
+            onNavigate={navigate}
+            onLogout={handleLogout}
+            userName={userName}
+          />
+        );
+
+      case 'admin-panel':
+        return (
+          <AdminDashboardPage
+            onNavigate={navigate}
+            onLogout={handleLogout}
+          />
+        );
+
       default:
         return <LandingPage onNavigate={navigate} />;
     }
