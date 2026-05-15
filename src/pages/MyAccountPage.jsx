@@ -95,7 +95,7 @@ export default function MyAccount({ onNavigate, onLogout, userName }) {
     backgroundColor: 'rgba(61,8,8,0.5)',
     border: `1px solid ${COLORS.gold.border}`,
     borderRadius: '8px',
-    color: COLORS.text?.white || '#fff',
+    color: COLORS.text?.white || '#ffff',
     fontFamily: FONTS.primary,
     fontSize: '14px',
     outline: 'none',
@@ -104,7 +104,7 @@ export default function MyAccount({ onNavigate, onLogout, userName }) {
 
   const labelStyle = {
     fontSize: '12px',
-    color: COLORS.text?.mutedGold || '#c9a84c',
+    color: COLORS.maroon?.medium || '#6B1A1A',
     fontFamily: FONTS.primary,
     fontWeight: 'bold',
     textTransform: 'uppercase',
@@ -115,7 +115,7 @@ export default function MyAccount({ onNavigate, onLogout, userName }) {
 
   const valueStyle = {
     fontSize: '15px',
-    color: COLORS.text?.white || '#fff',
+    color: COLORS.maroon?.dark || '#3D0808',
     fontFamily: FONTS.primary,
     padding: '10px 0',
     borderBottom: `1px solid rgba(212,168,67,0.15)`,
@@ -151,15 +151,25 @@ export default function MyAccount({ onNavigate, onLogout, userName }) {
     loginAlerts: { label: 'Login Alerts', desc: 'Notify on successful logins to your account' },
   };
 
-  return (
-    <div style={{ display: 'flex', minHeight: '100vh', backgroundColor: COLORS.maroon?.dark || '#3D0808' }}>
-      {/* Sidebar */}
-      <DashboardSidebar
-        activeKey={activeMenu}
-        onNavigate={handleMenuNavigate}
-        onLogout={onLogout}
-        userName={userName}
-      />
+      return (
+        <div style={{ display: 'flex', minHeight: '100vh', backgroundColor: COLORS.maroon?.dark || '#3D0808' }}>
+
+          <style>{`
+            .account-input::placeholder {
+              color: rgba(255, 255, 255, 0.7);
+            }
+            .account-input {
+              color: #ffffff;
+            }
+          `}</style>
+
+          {/* Sidebar */}
+          <DashboardSidebar
+            activeKey={activeMenu}
+            onNavigate={handleMenuNavigate}
+            onLogout={onLogout}
+            userName={userName}
+          />
 
       {/* Main Content */}
       <div style={{ flex: 1, overflowY: 'auto', backgroundColor: COLORS.bgSection }}>
@@ -342,7 +352,7 @@ export default function MyAccount({ onNavigate, onLogout, userName }) {
             </div>
 
             {!editingPassword ? (
-              <p style={{ fontSize: '14px', color: COLORS.textMuted, fontFamily: FONTS.primary, margin: 0 }}>
+              <p style={{ fontSize: '14px', color: COLORS.text?.black || '#000000', fontFamily: FONTS.primary, margin: 0 }}>
                 Your password was last changed 30 days ago. We recommend updating it regularly to keep your account secure.
               </p>
             ) : (
@@ -352,6 +362,7 @@ export default function MyAccount({ onNavigate, onLogout, userName }) {
                   <input
                     type="password"
                     style={inputStyle}
+                    className="account-input"
                     value={passwords.current}
                     placeholder="Enter current password"
                     onChange={(e) => setPasswords((p) => ({ ...p, current: e.target.value }))}
@@ -362,6 +373,7 @@ export default function MyAccount({ onNavigate, onLogout, userName }) {
                   <input
                     type="password"
                     style={inputStyle}
+                    className="account-input"
                     value={passwords.newPass}
                     placeholder="Enter new password"
                     onChange={(e) => setPasswords((p) => ({ ...p, newPass: e.target.value }))}
@@ -372,6 +384,7 @@ export default function MyAccount({ onNavigate, onLogout, userName }) {
                   <input
                     type="password"
                     style={inputStyle}
+                    className="account-input"
                     value={passwords.confirm}
                     placeholder="Confirm new password"
                     onChange={(e) => setPasswords((p) => ({ ...p, confirm: e.target.value }))}
