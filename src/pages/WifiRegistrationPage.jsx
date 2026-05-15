@@ -9,7 +9,15 @@
  */
 
 import { useState } from 'react';
-import { COLORS, FONTS } from '../constants/theme';
+import {
+  COLORS,
+  FONTS,
+  getNextDeviceNumber,
+  getRegisteredDeviceCount,
+  incrementRegisteredDeviceCount,
+  requiresAdminApproval,
+  MAX_DEVICES_PER_STUDENT,
+} from '../constants/theme';
 import DashboardSidebar from '../components/DashboardSidebar';
 import Card from '../components/Card';
 
@@ -129,6 +137,9 @@ export default function WifiRegistrationPage({ onNavigate, onLogout, userName, u
 
   // Step 3 / 4
   const [isConnecting, setIsConnecting] = useState(false);
+  const [registeredCount, setRegisteredCount] = useState(getRegisteredDeviceCount);
+  const [deviceNo, setDeviceNo] = useState(null);
+  const [registrationStatus, setRegistrationStatus] = useState(null);
 
   // ── Navigation ──────────────────────────────────────────────────
   const handleMenuNavigate = (key) => {
@@ -177,17 +188,28 @@ export default function WifiRegistrationPage({ onNavigate, onLogout, userName, u
 
   // ── Step 3: confirm & connect ────────────────────────────────────
   const handleConfirm = () => {
+    if (registeredCount >= MAX_DEVICES_PER_STUDENT) return;
+
+    const nextDeviceNo = getNextDeviceNumber(registeredCount);
+    const needsReview = requiresAdminApproval(nextDeviceNo);
+
     setIsConnecting(true);
     setTimeout(() => {
+      incrementRegisteredDeviceCount();
+      setRegisteredCount(c => c + 1);
+      setDeviceNo(nextDeviceNo);
+      setRegistrationStatus(needsReview ? 'PENDING' : 'APPROVED');
       setIsConnecting(false);
       setStep(4);
     }, 1400);
   };
 
   const handleReset = () => {
+    if (registeredCount >= MAX_DEVICES_PER_STUDENT) return;
     setBrand(''); setModel(''); setVoucher('');
     setVoucherInfo(null); setVoucherError('');
-    setStep1Errors({}); setStep(1);
+    setStep1Errors({}); setDeviceNo(null); setRegistrationStatus(null);
+    setStep(1);
   };
 
   // ── Shared input style ───────────────────────────────────────────
@@ -310,7 +332,8 @@ export default function WifiRegistrationPage({ onNavigate, onLogout, userName, u
 
                   <InfoBox>
                     ℹ️ You may register up to <strong>2 devices</strong> per account.
-                    Each device requires a valid school-issued voucher.
+                    Your <strong>1st device</strong> is registered immediately.
+                    Your <strong>2nd device</strong> is sent to an admin for approval before it can connect.
                   </InfoBox>
 
                   <button type="submit" style={btnPrimary(false)}>
@@ -422,8 +445,17 @@ export default function WifiRegistrationPage({ onNavigate, onLogout, userName, u
                   </div>
 
                   <InfoBox>
-                    ✅ Voucher is valid. Clicking <strong>Confirm & Connect</strong> will register your device
-                    and consume one voucher use.
+                    {registeredCount === 0 ? (
+                      <>
+                        ✅ Voucher is valid. This will be your <strong>1st device</strong> and will be
+                        <strong> auto-approved</strong> when you confirm.
+                      </>
+                    ) : (
+                      <>
+                        ✅ Voucher is valid. This will be your <strong>2nd device</strong> and will be
+                        submitted for <strong>admin approval</strong> before it can connect.
+                      </>
+                    )}
                   </InfoBox>
 
                   <div style={{ display: 'flex', gap: '10px' }}>
@@ -444,13 +476,26 @@ export default function WifiRegistrationPage({ onNavigate, onLogout, userName, u
           {/* ═══ STEP 4: Connected / Done ═══ */}
           {step === 4 && (
             <Card style={{ textAlign: 'center', padding: '48px 32px' }}>
-              <div style={{ fontSize: '72px', marginBottom: '16px' }}>✅</div>
+              <div style={{ fontSize: '72px', marginBottom: '16px' }}>
+                {registrationStatus === 'PENDING' ? '⏳' : '✅'}
+              </div>
               <h2 style={{ fontSize: '24px', fontWeight: 'bold', color: COLORS.textHeading, fontFamily: FONTS.primary, marginBottom: '10px' }}>
-                Device Registered!
+                {registrationStatus === 'PENDING' ? 'Submitted for Admin Review' : 'Device Registered!'}
               </h2>
               <p style={{ fontSize: '14px', color: COLORS.textMuted, fontFamily: FONTS.primary, lineHeight: '1.7', marginBottom: '28px' }}>
-                Your <strong style={{ color: COLORS.textBody }}>{brand} {model}</strong> has been
-                successfully registered to <strong style={{ color: COLORS.textBody }}>CITU-WIFI</strong>.<br />
+                {registrationStatus === 'PENDING' ? (
+                  <>
+                    Your <strong style={{ color: COLORS.textBody }}>{brand} {model}</strong> (Device #{deviceNo}) has been
+                    submitted. An administrator will review your <strong>2nd device</strong> before it can join{' '}
+                    <strong style={{ color: COLORS.textBody }}>CITU-WIFI</strong>.
+                  </>
+                ) : (
+                  <>
+                    Your <strong style={{ color: COLORS.textBody }}>{brand} {model}</strong> (Device #{deviceNo}) has been
+                    auto-approved and registered to <strong style={{ color: COLORS.textBody }}>CITU-WIFI</strong>.
+                  </>
+                )}
+                <br />
                 Voucher <strong style={{ color: COLORS.textBody, fontFamily: FONTS.mono }}>{voucherInfo?.code}</strong> has
                 been used ({voucherInfo?.uses + 1}/{voucherInfo?.max}).
               </p>
@@ -477,9 +522,11 @@ export default function WifiRegistrationPage({ onNavigate, onLogout, userName, u
               </div>
 
               <div style={{ display: 'flex', gap: '12px', justifyContent: 'center' }}>
+                {registeredCount < MAX_DEVICES_PER_STUDENT && (
                 <button onClick={handleReset} style={btnSecondary}>
                   Register Another Device
                 </button>
+                )}
                 <button
                   onClick={() => onNavigate('dashboard')}
                   style={{

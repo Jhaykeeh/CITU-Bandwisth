@@ -29,16 +29,23 @@ export default function LoginPage({ onNavigate, onLogin }) {
   };
 
   const handleSubmit = (e) => {
-    e.preventDefault();
-    if (!validate()) return;
+  e.preventDefault();
+  if (!validate()) return;
 
-    setIsLoading(true);
-    setTimeout(() => {
-      setIsLoading(false);
-      onLogin({ schoolId, name: schoolId });
+  setIsLoading(true);
+  setTimeout(() => {
+    setIsLoading(false);
+
+    // Check if admin credentials
+    if (schoolId === 'admin' && password === 'admin123') {
+      onLogin({ schoolId, name: 'IT Administrator', role: 'admin' });
+      onNavigate('admin-panel');
+    } else {
+      onLogin({ schoolId, name: schoolId, role: 'student' });
       onNavigate('dashboard');
-    }, 1000);
-  };
+    }
+  }, 1000);
+};
 
   return (
     <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>

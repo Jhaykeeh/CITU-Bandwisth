@@ -85,3 +85,36 @@ export const REGISTRATION_STEPS = [
   { label: 'Verify', icon: '✓' },
   { label: 'Connect', icon: '📶' },
 ];
+
+export const MAX_DEVICES_PER_STUDENT = 2;
+
+export function getNextDeviceNumber(registeredCount) {
+  return Math.min(registeredCount + 1, MAX_DEVICES_PER_STUDENT);
+}
+
+export function requiresAdminApproval(deviceNo) {
+  return deviceNo === 2;
+}
+
+export function getRegistrationStatus(deviceNo) {
+  return deviceNo === 1 ? 'APPROVED' : 'PENDING';
+}
+
+export function getRegisteredDeviceCount() {
+  try {
+    const n = parseInt(localStorage.getItem('citu_device_count') || '0', 10);
+    return Number.isFinite(n) ? Math.max(0, Math.min(n, MAX_DEVICES_PER_STUDENT)) : 0;
+  } catch (e) {
+    return 0;
+  }
+}
+
+export function incrementRegisteredDeviceCount() {
+  const next = Math.min(getRegisteredDeviceCount() + 1, MAX_DEVICES_PER_STUDENT);
+  try {
+    localStorage.setItem('citu_device_count', String(next));
+  } catch (e) {
+    // ignore
+  }
+  return next;
+}
