@@ -55,6 +55,12 @@ export const NAV_LINKS = [
 
 export const MENU_FEATURES = [
   {
+    icon: '🏠',
+    title: 'Dashboard',
+    desc: 'Overview of your network and devices',
+    key: 'dashboard',
+  },
+  {
     icon: '📶',
     title: 'WiFi Registration',
     desc: 'Register new devices to the campus network',
