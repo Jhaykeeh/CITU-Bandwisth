@@ -72,24 +72,6 @@ export const MENU_FEATURES = [
     desc: 'Manage your profile and settings',
     key: 'my-account',
   },
-  {
-    icon: '📈',
-    title: 'Usage Reports',
-    desc: 'View detailed bandwidth consumption reports',
-    key: 'usage-reports',
-  },
-  {
-    icon: '🔒',
-    title: 'Access Control',
-    desc: 'Manage network access permissions',
-    key: 'access-control',
-  },
-  {
-    icon: '⚙️',
-    title: 'Admin Panel',
-    desc: 'System administration and configuration',
-    key: 'admin-panel',
-  },
 ];
 
 export const REGISTRATION_STEPS = [
