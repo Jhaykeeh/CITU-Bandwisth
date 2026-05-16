@@ -7,6 +7,7 @@
  */
 
 import { useState } from 'react';
+import { authService } from '../services/authService';
 import { COLORS, FONTS } from '../constants/theme';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
@@ -27,6 +28,7 @@ export default function RegisterPage({ onNavigate, onRegister }) {
   const [isLoading, setIsLoading] = useState(false);
   const [hoveredButton, setHoveredButton] = useState(null);
   const [focusedField, setFocusedField] = useState(null);
+  const [formError, setFormError] = useState('');
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -61,20 +63,26 @@ export default function RegisterPage({ onNavigate, onRegister }) {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (!validate()) return;
 
     setIsLoading(true);
-    setTimeout(() => {
-      setIsLoading(false);
-      onRegister({
-        name: `${formData.firstName} ${formData.lastName}`,
+    setFormError('');
+    try {
+      const data = await authService.register({
+        schoolId: formData.schoolId,
+        password: formData.password,
         email: formData.email,
-        role: formData.role,
       });
-      onNavigate('landing');
-    }, 1200);
+      onRegister(data);
+      onNavigate('dashboard');
+    } catch (err) {
+      const msg = err.response?.data?.message || 'Registration failed. Please try again.';
+      setFormError(msg);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const inputStyle = (fieldName) => ({
@@ -287,6 +295,16 @@ export default function RegisterPage({ onNavigate, onRegister }) {
                 <p style={{ color: '#ff4444', fontFamily: FONTS.primary, fontSize: '12px', marginTop: '-10px', marginBottom: 0 }}>
                   {errors.agreeTerms}
                 </p>
+              )}
+
+              {formError && (
+                <div style={{
+                  padding: '12px 16px', backgroundColor: 'rgba(244,67,54,0.1)',
+                  border: '1px solid #F44336', borderRadius: '8px',
+                  color: '#F44336', fontFamily: FONTS.primary, fontSize: '14px',
+                }}>
+                  {formError}
+                </div>
               )}
 
               {/* Submit Button */}

@@ -1,12 +1,9 @@
 /**
  * App.jsx - Main Application Router
- *
- * Central router/controller for WildConnect application.
- * Manages page state with switch statement rendering.
- * Handles login, register, and logout navigation flows.
  */
 
 import { useState } from 'react';
+import { authService } from './services/authService';
 import LandingPage from './pages/LandingPage';
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
@@ -19,13 +16,28 @@ import BandwidthMonitorPage from './pages/BandwidthMonitorPage';
 import WifiRegistrationPage from './pages/WifiRegistrationPage';
 import AdminDashboardPage from './pages/AdminDashboardPage';
 
-export default function App() {
-  const [currentPage, setCurrentPage] = useState('landing');
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [userName, setUserName] = useState('');
-  const [userRole, setUserRole] = useState(''); // 'student' | 'admin'
+function getInitialUser() {
+  if (!authService.isAuthenticated()) {
+    return { schoolId: '', role: '' };
+  }
 
-  // Navigation handler
+  const user = authService.getCurrentUser();
+  return {
+    schoolId: user?.schoolId || '',
+    role: user?.role === 'ADMIN' ? 'admin' : 'student',
+  };
+}
+
+export default function App() {
+  const [currentPage, setCurrentPage] = useState(() => {
+    if (authService.isAuthenticated()) return 'dashboard';
+    return 'landing';
+  });
+  const [isLoggedIn, setIsLoggedIn] = useState(authService.isAuthenticated());
+  const [userName, setUserName] = useState(() => getInitialUser().schoolId);
+  const [userRole, setUserRole] = useState(() => getInitialUser().role);
+
+  // Navigation
   const navigate = (page) => {
     setCurrentPage(page);
     window.scrollTo(0, 0);
@@ -34,26 +46,38 @@ export default function App() {
   // Login handler
   const handleLogin = (userData) => {
     setIsLoggedIn(true);
-    setUserName(userData.name || userData.schoolId);
-    setUserRole(userData.role || 'student');
+    setUserName(userData.schoolId);
+    setUserRole(userData.role === 'ADMIN' ? 'admin' : 'student');
+    navigate('dashboard');
   };
 
   // Register handler
   const handleRegister = (userData) => {
     setIsLoggedIn(true);
-    setUserName(userData.name);
+    setUserName(userData.schoolId);
     setUserRole('student');
+    navigate('dashboard');
   };
 
-  // Logout handler
+  // Logout
   const handleLogout = () => {
+    authService.logout();
     setIsLoggedIn(false);
     setUserName('');
     setUserRole('');
     navigate('landing');
   };
 
-  // Page renderer
+  // AUTH GUARD (Private Route logic)
+  const requireAuth = (component) => {
+    return isLoggedIn ? component : (navigate('login'), null);
+  };
+
+  // ADMIN GUARD
+  const requireAdmin = (component) => {
+    return userRole === 'admin' ? component : (navigate('dashboard'), null);
+  };
+
   const renderPage = () => {
     switch (currentPage) {
 
@@ -76,8 +100,7 @@ export default function App() {
         return <ContactPage onNavigate={navigate} />;
 
       case 'dashboard':
-        if (!isLoggedIn) { navigate('login'); return null; }
-        return (
+        return requireAuth(
           <DashboardPage
             onNavigate={navigate}
             onLogout={handleLogout}
@@ -87,8 +110,7 @@ export default function App() {
         );
 
       case 'my-account':
-        if (!isLoggedIn) { navigate('login'); return null; }
-        return (
+        return requireAuth(
           <MyAccountPage
             onNavigate={navigate}
             onLogout={handleLogout}
@@ -98,8 +120,7 @@ export default function App() {
         );
 
       case 'bandwidth-monitor':
-        if (!isLoggedIn) { navigate('login'); return null; }
-        return (
+        return requireAuth(
           <BandwidthMonitorPage
             onNavigate={navigate}
             onLogout={handleLogout}
@@ -109,8 +130,7 @@ export default function App() {
         );
 
       case 'wifi-registration':
-        if (!isLoggedIn) { navigate('login'); return null; }
-        return (
+        return requireAuth(
           <WifiRegistrationPage
             onNavigate={navigate}
             onLogout={handleLogout}
@@ -120,12 +140,13 @@ export default function App() {
         );
 
       case 'admin-panel':
-        if (userRole !== 'admin') { navigate('dashboard'); return null; }
-        return (
-          <AdminDashboardPage
-            onNavigate={navigate}
-            onLogout={handleLogout}
-          />
+        return requireAuth(
+          requireAdmin(
+            <AdminDashboardPage
+              onNavigate={navigate}
+              onLogout={handleLogout}
+            />
+          )
         );
 
       default:

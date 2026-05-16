@@ -6,7 +6,8 @@
  * Follows the DashboardPage UI conventions (maroon/gold theme).
  */
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { userService } from '../services/authService';
 import { COLORS, FONTS } from '../constants/theme';
 import DashboardSidebar from '../components/DashboardSidebar';
 import Card from '../components/Card';
@@ -18,18 +19,31 @@ export default function MyAccount({ onNavigate, onLogout, userName }) {
   const [savingProfile, setSavingProfile] = useState(false);
   const [savingPassword, setSavingPassword] = useState(false);
   const [successMsg, setSuccessMsg] = useState('');
+  const [loadingProfile, setLoadingProfile] = useState(true);
 
   const [profile, setProfile] = useState({
-    firstName: 'Juan',
-    lastName: 'Dela Cruz',
-    email: 'juan.delacruz@wildcats.edu.ph',
-    studentId: '2021-00123',
-    course: 'BS Computer Science',
-    year: '3rd Year',
-    contactNumber: '+63 912 345 6789',
+    firstName: userName || 'User',
+    lastName: '',
+    email: '',
+    studentId: userName || '',
+    course: '',
+    year: '',
+    contactNumber: '',
   });
 
   const [profileDraft, setProfileDraft] = useState({ ...profile });
+
+  useEffect(() => {
+    userService.getProfile()
+      .then(data => {
+        if (data && data.email) {
+          setProfile(prev => ({ ...prev, email: data.email }));
+          setProfileDraft(prev => ({ ...prev, email: data.email }));
+        }
+      })
+      .catch(() => {})
+      .finally(() => setLoadingProfile(false));
+  }, []);
 
   const [passwords, setPasswords] = useState({
     current: '',
@@ -54,15 +68,19 @@ export default function MyAccount({ onNavigate, onLogout, userName }) {
     onNavigate('dashboard');
   };
 
-  const handleProfileSave = () => {
+  const handleProfileSave = async () => {
     setSavingProfile(true);
-    setTimeout(() => {
+    try {
+      await userService.updateProfile({ email: profileDraft.email });
       setProfile({ ...profileDraft });
       setEditingProfile(false);
-      setSavingProfile(false);
       setSuccessMsg('Profile updated successfully!');
+    } catch {
+      setSuccessMsg('Failed to update profile.');
+    } finally {
+      setSavingProfile(false);
       setTimeout(() => setSuccessMsg(''), 3000);
-    }, 800);
+    }
   };
 
   const handleProfileCancel = () => {
@@ -249,6 +267,12 @@ export default function MyAccount({ onNavigate, onLogout, userName }) {
               </div>
             </div>
           </Card>
+
+          {loadingProfile && (
+            <p style={{ fontSize: '13px', color: COLORS.textMuted, fontFamily: FONTS.primary, margin: '-20px 0 24px' }}>
+              Loading profile details...
+            </p>
+          )}
 
           {/* Success Toast */}
           {successMsg && (

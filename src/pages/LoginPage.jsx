@@ -7,6 +7,7 @@
  */
 
 import { useState } from 'react';
+import { authService } from '../services/authService';
 import { COLORS, FONTS } from '../constants/theme';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
@@ -19,6 +20,7 @@ export default function LoginPage({ onNavigate, onLogin }) {
   const [isLoading, setIsLoading] = useState(false);
   const [hoveredButton, setHoveredButton] = useState(null);
   const [focusedField, setFocusedField] = useState(null);
+  const [formError, setFormError] = useState('');
 
   const validate = () => {
     const newErrors = {};
@@ -28,24 +30,27 @@ export default function LoginPage({ onNavigate, onLogin }) {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = (e) => {
-  e.preventDefault();
-  if (!validate()) return;
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (!validate()) return;
 
-  setIsLoading(true);
-  setTimeout(() => {
-    setIsLoading(false);
-
-    // Check if admin credentials
-    if (schoolId === 'admin' && password === 'admin123') {
-      onLogin({ schoolId, name: 'IT Administrator', role: 'admin' });
-      onNavigate('admin-panel');
-    } else {
-      onLogin({ schoolId, name: schoolId, role: 'student' });
-      onNavigate('dashboard');
+    setIsLoading(true);
+    setFormError('');
+    try {
+      const data = await authService.login({ schoolId, password });
+      onLogin(data);
+      if (data.role === 'ADMIN') {
+        onNavigate('admin-panel');
+      } else {
+        onNavigate('dashboard');
+      }
+    } catch (err) {
+      const msg = err.response?.data?.message || 'Login failed. Please check your credentials.';
+      setFormError(msg);
+    } finally {
+      setIsLoading(false);
     }
-  }, 1000);
-};
+  };
 
   return (
     <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
@@ -102,6 +107,15 @@ export default function LoginPage({ onNavigate, onLogin }) {
           </h2>
 
           <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+            {formError && (
+              <div style={{
+                padding: '12px 16px', backgroundColor: 'rgba(244,67,54,0.1)',
+                border: '1px solid #F44336', borderRadius: '8px',
+                color: '#F44336', fontFamily: FONTS.primary, fontSize: '14px',
+              }}>
+                {formError}
+              </div>
+            )}
             {/* School ID Field */}
             <div>
               <label style={{ display: 'block', color: COLORS.textHeading, fontFamily: FONTS.primary, fontSize: '14px', fontWeight: 'bold', marginBottom: '8px' }}>

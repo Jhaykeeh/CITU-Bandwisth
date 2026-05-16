@@ -100,20 +100,24 @@ export function getRegistrationStatus(deviceNo) {
   return deviceNo === 1 ? 'APPROVED' : 'PENDING';
 }
 
-export function getRegisteredDeviceCount() {
+export function getRegisteredDeviceCount(userId) {
+  if (!userId) return 0;
   try {
-    const n = parseInt(localStorage.getItem('citu_device_count') || '0', 10);
+    const key = `citu_device_count_${userId}`;
+    const n = parseInt(localStorage.getItem(key) || '0', 10);
     return Number.isFinite(n) ? Math.max(0, Math.min(n, MAX_DEVICES_PER_STUDENT)) : 0;
-  } catch (e) {
+  } catch {
     return 0;
   }
 }
 
-export function incrementRegisteredDeviceCount() {
-  const next = Math.min(getRegisteredDeviceCount() + 1, MAX_DEVICES_PER_STUDENT);
+export function incrementRegisteredDeviceCount(userId) {
+  if (!userId) return 0;
+  const key = `citu_device_count_${userId}`;
+  const next = Math.min(getRegisteredDeviceCount(userId) + 1, MAX_DEVICES_PER_STUDENT);
   try {
-    localStorage.setItem('citu_device_count', String(next));
-  } catch (e) {
+    localStorage.setItem(key, String(next));
+  } catch {
     // ignore
   }
   return next;

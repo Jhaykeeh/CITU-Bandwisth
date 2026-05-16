@@ -20,7 +20,7 @@
  *   { key: 'bandwidth', icon: '📡', title: 'Bandwidth Monitor', desc: 'Real-time WiFi usage tracking and device analytics.' }
  */
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import {
   Chart as ChartJS,
   LineElement,
@@ -31,6 +31,7 @@ import {
   Tooltip,
 } from 'chart.js';
 import { Line } from 'react-chartjs-2';
+import { bandwidthService } from '../services/authService';
 import { COLORS, FONTS } from '../constants/theme';
 import DashboardSidebar from '../components/DashboardSidebar';
 import Card from '../components/Card';
@@ -242,14 +243,23 @@ function UsageBar({ day, gb, maxGb }) {
 export default function BandwidthMonitorPage({ onNavigate, onLogout, userName }) {
   const [activeMenu, setActiveMenu] = useState('bandwidth-monitor');
   const [usageView, setUsageView] = useState('daily');
+  const [totalUsage, setTotalUsage] = useState(3.2);
+  const [loading, setLoading] = useState(true);
 
   // Real-time speed series
   const [dlHistory, setDlHistory] = useState(() => makeInitialSeries(randomDl));
   const [ulHistory, setUlHistory] = useState(() => makeInitialSeries(randomUl));
-  const labels = useRef(makeLabels());
+  const [labels] = useState(makeLabels);
 
   // Countdown timer state (14 days, 6 hours, 22 min, 41 sec)
   const [countdown, setCountdown] = useState({ d: 14, h: 6, m: 22, s: 41 });
+
+  useEffect(() => {
+    bandwidthService.getTotalUsage()
+      .then(val => { if (typeof val === 'number') setTotalUsage(val / 1024); })
+      .catch(() => {})
+      .finally(() => setLoading(false));
+  }, []);
 
   // Live speed tick
   useEffect(() => {
@@ -293,7 +303,7 @@ export default function BandwidthMonitorPage({ onNavigate, onLogout, userName })
 
   // Chart.js config
   const chartData = {
-    labels: labels.current,
+    labels,
     datasets: [
       {
         label: 'Download',
@@ -450,7 +460,7 @@ export default function BandwidthMonitorPage({ onNavigate, onLogout, userName })
                     Monthly Data Cap
                   </div>
                   <div style={{ fontSize: '32px', fontWeight: 'bold', color: COLORS.text.gold, fontFamily: FONTS.mono }}>
-                    3.2{' '}
+                    {totalUsage.toFixed(1)}{' '}
                     <span style={{ fontSize: '18px', color: COLORS.text.mutedGold }}>GB</span>{' '}
                     <span style={{ fontSize: '16px', color: COLORS.text.mutedGold }}>of 5 GB</span>
                   </div>
@@ -466,13 +476,12 @@ export default function BandwidthMonitorPage({ onNavigate, onLogout, userName })
               </div>
 
               <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '13px', color: COLORS.text.mutedGold, fontFamily: FONTS.primary, marginBottom: '8px' }}>
-                <span>Used: <strong style={{ color: COLORS.text.gold }}>64%</strong></span>
-                <span>Remaining: <strong style={{ color: '#4CAF50' }}>1.8 GB</strong></span>
+                <span>Used: <strong style={{ color: COLORS.text.gold }}>{Math.round((totalUsage / 5) * 100)}%</strong></span>
+                <span>Remaining: <strong style={{ color: '#4CAF50' }}>{(5 - totalUsage).toFixed(1)} GB</strong></span>
               </div>
-              <ProgressBar pct={64} height={14} />
+              <ProgressBar pct={Math.round((totalUsage / 5) * 100)} height={14} />
               <p style={{ fontSize: '12px', color: COLORS.text.mutedGold, fontFamily: FONTS.primary, marginTop: '8px', margin: '8px 0 0' }}>
-                At current usage rate, you will use approximately{' '}
-                <span style={{ color: COLORS.text.gold }}>4.8 GB</span> by reset — within your cap.
+                {loading ? 'Loading usage data...' : `Current usage: ${totalUsage.toFixed(1)} GB of 5 GB cap.`}
               </p>
             </Card>
 
