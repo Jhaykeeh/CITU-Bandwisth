@@ -1,5 +1,7 @@
-import { useState } from 'react';
-import { COLORS, FONTS, requiresAdminApproval } from '../constants/theme';
+import { useState, useEffect } from 'react';
+import { userService, deviceService } from '../services/authService';
+import api from '../services/api';
+import { COLORS, FONTS } from '../constants/theme';
 import Card from '../components/Card';
 
 const SIDEBAR_ITEMS = [
@@ -19,11 +21,11 @@ const MOCK_REQUESTS = [
 ];
 
 const MOCK_USERS = [
-  { schoolId: '2021-00123', name: 'Juan Dela Cruz',  devices: 1, usage: '1.2 GB', usageRaw: 1.2, status: 'Active',  role: 'student', suspended: false },
-  { schoolId: '2021-00456', name: 'Maria Santos',    devices: 0, usage: '0 GB',   usageRaw: 0,   status: 'Pending', role: 'student', suspended: false },
-  { schoolId: '2020-00789', name: 'Jose Reyes',      devices: 2, usage: '4.1 GB', usageRaw: 4.1, status: 'Active',  role: 'student', suspended: false },
-  { schoolId: '2022-00012', name: 'Ana Cruz',        devices: 1, usage: '0.8 GB', usageRaw: 0.8, status: 'Active',  role: 'student', suspended: false },
-  { schoolId: '2023-00345', name: 'Pedro Bautista',  devices: 2, usage: '5.0 GB', usageRaw: 5.0, status: 'Capped',  role: 'student', suspended: false },
+  { id: 1,  schoolId: '2021-00123', name: 'Juan Dela Cruz',  devices: 1, usage: '1.2 GB', usageRaw: 1.2, status: 'Active',  role: 'student', suspended: false },
+  { id: 2,  schoolId: '2021-00456', name: 'Maria Santos',    devices: 0, usage: '0 GB',   usageRaw: 0,   status: 'Pending', role: 'student', suspended: false },
+  { id: 3,  schoolId: '2020-00789', name: 'Jose Reyes',      devices: 2, usage: '4.1 GB', usageRaw: 4.1, status: 'Active',  role: 'student', suspended: false },
+  { id: 4,  schoolId: '2022-00012', name: 'Ana Cruz',        devices: 1, usage: '0.8 GB', usageRaw: 0.8, status: 'Active',  role: 'student', suspended: false },
+  { id: 5,  schoolId: '2023-00345', name: 'Pedro Bautista',  devices: 2, usage: '5.0 GB', usageRaw: 5.0, status: 'Capped',  role: 'student', suspended: false },
 ];
 
 const MOCK_ADMINS = [
@@ -40,13 +42,61 @@ const MOCK_LOGS = [
   { time: 'Yesterday', admin: 'IT Administrator', action: 'Added new admin',         target: 'Mary Support' },
 ];
 
-export default function AdminDashboardPage({ onNavigate, onLogout }) {
+export default function AdminDashboardPage({ onLogout }) {
   const [activeKey, setActiveKey]     = useState('overview');
   const [requests, setRequests]       = useState(MOCK_REQUESTS);
   const [users, setUsers]             = useState(MOCK_USERS);
   const [admins, setAdmins]           = useState(MOCK_ADMINS);
   const [logs, setLogs]               = useState(MOCK_LOGS);
   const [hoveredItem, setHoveredItem] = useState(null);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        // Load pending registrations from localStorage (submitted via WifiRegistrationPage)
+        const pendingRaw = localStorage.getItem('pending_registrations');
+        const pending = pendingRaw ? JSON.parse(pendingRaw) : [];
+
+        const [allUsers, allDevices] = await Promise.all([
+          userService.getAllUsers().catch(() => []),
+          deviceService.getAllDevices().catch(() => []),
+        ]);
+        let apiRequests = [];
+        if (Array.isArray(allDevices) && allDevices.length > 0) {
+          apiRequests = allDevices.map(d => ({
+            id: d.id,
+            schoolId: d.userId?.toString() || '',
+            name: d.brand + ' ' + d.model,
+            brand: d.brand,
+            model: d.model,
+            voucherCode: null,
+            deviceNo: d.approvalStatus === 'PENDING' ? 2 : 1,
+            status: d.approvalStatus || (d.active ? 'APPROVED' : 'PENDING'),
+            submitted: new Date(d.createdAt || Date.now()).toLocaleString(),
+          }));
+        }
+        // Merge: pending from localStorage first, then API data
+        setRequests([...pending, ...apiRequests]);
+
+        if (Array.isArray(allUsers) && allUsers.length > 0) {
+          setUsers(allUsers.map(u => ({
+            id: u.id,
+            schoolId: u.schoolId,
+            name: u.schoolId,
+            devices: 0,
+            usage: '0 GB',
+            usageRaw: 0,
+            status: u.status === 'DISABLED' ? 'Suspended' : 'Active',
+            role: u.role === 'ADMIN' ? 'admin' : 'student',
+            suspended: u.status === 'DISABLED',
+          })));
+        }
+      } catch (err) {
+        console.error('Failed to fetch admin data:', err);
+      }
+    };
+    fetchData();
+  }, []);
   const [showAddStudent, setShowAddStudent] = useState(false);
   const [showAddAdmin, setShowAddAdmin]     = useState(false);
   const [newStudent, setNewStudent] = useState({ schoolId: '', name: '' });
@@ -63,22 +113,56 @@ export default function AdminDashboardPage({ onNavigate, onLogout }) {
   const [autoReject, setAutoReject]           = useState(true);
   const [settingsSaved, setSettingsSaved]     = useState(false);
 
-  const handleApprove = (id) => {
-    setRequests(prev => prev.map(r => r.id === id ? { ...r, status: 'APPROVED' } : r));
-    const req = requests.find(r => r.id === id);
-    if (req) {
-      setUsers(prev => prev.map(u =>
-        u.schoolId === req.schoolId
-          ? { ...u, devices: Math.min(u.devices + 1, 2), status: 'Active' }
-          : u
-      ));
+  const handleApprove = async (id) => {
+    try {
+      await deviceService.approveDevice(id);
+    } catch (err) {
+      console.error('Backend approve failed, updating locally:', err);
+    }
+    setRequests(prev => {
+      const updated = prev.map(r => r.id === id ? { ...r, status: 'APPROVED' } : r);
+      localStorage.setItem('pending_registrations', JSON.stringify(updated.filter(r => r.voucherCode && r.status === 'PENDING')));
+      return updated;
+    });
+    addActivityLog('Approved device request', `Device #${id}`);
+  };
+  const handleReject = async (id) => {
+    try {
+      await deviceService.rejectDevice(id);
+    } catch (err) {
+      console.error('Backend reject failed, updating locally:', err);
+    }
+    setRequests(prev => {
+      const updated = prev.map(r => r.id === id ? { ...r, status: 'REJECTED' } : r);
+      localStorage.setItem('pending_registrations', JSON.stringify(updated.filter(r => r.voucherCode && r.status === 'PENDING')));
+      return updated;
+    });
+    addActivityLog('Rejected device request', `Device #${id}`);
+  };
+
+  const handleSuspend = (userId) => {
+    setUsers(prev =>
+      prev.map(u => u.id === userId ? { ...u, suspended: !u.suspended, status: u.suspended ? 'Active' : 'Suspended' } : u)
+    );
+    api.put(`/users/${userId}/disable`).catch(() => {});
+  };
+
+  const handleDeleteUser = async (userId) => {
+    if (!userId) {
+      flashAccessMessage('Cannot delete user: missing user ID. Try refreshing the data.', true);
+      return;
+    }
+    if (!window.confirm('Are you sure you want to permanently delete this user? This action cannot be undone.')) return;
+    try {
+      await userService.deleteUser(userId);
+      setUsers(prev => prev.filter(u => u.id !== userId));
+      addActivityLog('Deleted user', `User #${userId}`);
+      flashAccessMessage('User deleted successfully.');
+    } catch (err) {
+      console.error('Failed to delete user:', err);
+      flashAccessMessage('Failed to delete user. The server may be unavailable.', true);
     }
   };
-  const handleReject = (id) => setRequests(prev => prev.map(r => r.id === id ? { ...r, status: 'REJECTED' } : r));
-
-  const handleSuspend = (schoolId) => setUsers(prev =>
-    prev.map(u => u.schoolId === schoolId ? { ...u, suspended: !u.suspended, status: u.suspended ? 'Active' : 'Suspended' } : u)
-  );
 
   const handleSaveSettings = () => {
     setSettingsSaved(true);
@@ -185,8 +269,7 @@ export default function AdminDashboardPage({ onNavigate, onLogout }) {
                                '#F44336',
   });
 
-  const adminReviewRequests = requests.filter(r => requiresAdminApproval(r.deviceNo));
-  const pending  = adminReviewRequests.filter(r => r.status === 'PENDING').length;
+  const pending  = requests.filter(r => r.status === 'PENDING').length;
   const approved = requests.filter(r => r.status === 'APPROVED').length;
   const filteredRequests = filter === 'ALL' ? requests : requests.filter(r => r.status === filter);
 
@@ -268,7 +351,7 @@ export default function AdminDashboardPage({ onNavigate, onLogout }) {
         </nav>
 
         <div style={{ padding: '16px 20px', borderTop: `1px solid ${COLORS.gold.border}` }}>
-          <button onClick={() => onNavigate('landing')} style={{
+          <button onClick={onLogout} style={{
             width: '100%', backgroundColor: 'transparent', color: COLORS.text.mutedGold,
             border: `1px solid ${COLORS.gold.border}`, padding: '10px',
             borderRadius: '8px', fontFamily: FONTS.primary, fontSize: '13px', cursor: 'pointer',
@@ -364,16 +447,16 @@ export default function AdminDashboardPage({ onNavigate, onLogout }) {
               </h3>
               <Card style={{ padding: '0' }}>
                 <div style={{
-                  display: 'grid', gridTemplateColumns: '1.5fr 1fr 80px 80px 100px 100px',
+                  display: 'grid', gridTemplateColumns: '1.5fr 1fr 80px 80px 100px 100px 80px',
                   padding: '12px 24px', borderBottom: `1px solid ${COLORS.gold.border}`,
                   fontSize: '11px', fontWeight: 'bold', color: COLORS.textMuted,
                   fontFamily: FONTS.primary, textTransform: 'uppercase', letterSpacing: '0.05em',
                 }}>
-                  <span>Student</span><span>School ID</span><span>Devices</span><span>Usage</span><span>Status</span><span>Action</span>
+                  <span>Student</span><span>School ID</span><span>Devices</span><span>Usage</span><span>Status</span><span>Action</span><span>Delete</span>
                 </div>
                 {users.map((user, idx) => (
                   <div key={user.schoolId} style={{
-                    display: 'grid', gridTemplateColumns: '1.5fr 1fr 80px 80px 100px 100px',
+                    display: 'grid', gridTemplateColumns: '1.5fr 1fr 80px 80px 100px 100px 80px',
                     padding: '14px 24px',
                     borderBottom: idx < users.length - 1 ? `1px solid ${COLORS.gold.border}` : 'none',
                     alignItems: 'center',
@@ -383,14 +466,23 @@ export default function AdminDashboardPage({ onNavigate, onLogout }) {
                     <span style={{ fontSize: '13px', color: COLORS.textBody, fontFamily: FONTS.mono, textAlign: 'center' }}>{user.devices}/2</span>
                     <span style={{ fontSize: '13px', color: COLORS.textBody, fontFamily: FONTS.mono }}>{user.usage}</span>
                     <span style={statusPill(user.status)}>{user.status}</span>
-                    <button onClick={() => handleSuspend(user.schoolId)} style={{
+                    <button onClick={() => handleSuspend(user.id)} style={{
                       padding: '5px 12px', borderRadius: '6px', fontSize: '12px', cursor: 'pointer',
-                      fontFamily: FONTS.primary, fontWeight: 'bold', border: 'none',
+                      fontFamily: FONTS.primary, fontWeight: 'bold',
                       backgroundColor: user.suspended ? 'rgba(76,175,80,0.15)' : 'rgba(244,67,54,0.15)',
                       color: user.suspended ? '#4CAF50' : '#F44336',
                       border: user.suspended ? '1px solid rgba(76,175,80,0.4)' : '1px solid rgba(244,67,54,0.4)',
                     }}>
                       {user.suspended ? '✓ Restore' : '⊘ Suspend'}
+                    </button>
+                    <button onClick={() => handleDeleteUser(user.id)} style={{
+                      padding: '5px 12px', borderRadius: '6px', fontSize: '12px', cursor: 'pointer',
+                      fontFamily: FONTS.primary, fontWeight: 'bold',
+                      backgroundColor: 'rgba(244,67,54,0.15)',
+                      color: '#F44336',
+                      border: '1px solid rgba(244,67,54,0.4)',
+                    }}>
+                      🗑 Delete
                     </button>
                   </div>
                 ))}
@@ -407,7 +499,7 @@ export default function AdminDashboardPage({ onNavigate, onLogout }) {
                     Device Registration Requests
                   </h3>
                   <p style={{ fontSize: '12px', color: COLORS.textMuted, fontFamily: FONTS.primary, margin: '4px 0 0' }}>
-                    1st devices are auto-approved · only 2nd devices need your review
+                    1st use of a voucher is auto-approved · 2nd use of same voucher needs your review
                   </p>
                 </div>
                 <div style={{ display: 'flex', gap: '8px' }}>
@@ -447,6 +539,11 @@ export default function AdminDashboardPage({ onNavigate, onLogout }) {
                       <div style={{ fontSize: '13px', color: COLORS.textMuted, fontFamily: FONTS.primary }}>
                         {req.brand} {req.model} — Device #{req.deviceNo} · {req.submitted}
                       </div>
+                      {req.voucherCode && (
+                        <div style={{ fontSize: '12px', color: COLORS.text.gold, fontFamily: FONTS.mono, marginTop: '4px' }}>
+                          🎫 Voucher: {req.voucherCode}
+                        </div>
+                      )}
                     </div>
                     <span style={statusPill(req.status)}>{req.status}</span>
                     {req.deviceNo === 1 && req.status === 'APPROVED' && (
@@ -457,7 +554,7 @@ export default function AdminDashboardPage({ onNavigate, onLogout }) {
                         Auto-approved
                       </span>
                     )}
-                    {req.status === 'PENDING' && requiresAdminApproval(req.deviceNo) && (
+                    {req.status === 'PENDING' && (
                       <div style={{ display: 'flex', gap: '8px' }}>
                         <button onClick={() => handleApprove(req.id)} style={{
                           padding: '7px 16px', borderRadius: '6px',
