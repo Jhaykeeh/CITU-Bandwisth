@@ -11,12 +11,12 @@
  */
 
 import { useState, useEffect } from 'react';
-import { deviceService, bandwidthService } from '../services/authService';
+import { deviceService, bandwidthService, userService } from '../services/authService';
 import { COLORS, FONTS } from '../constants/theme';
 import DashboardSidebar from '../components/DashboardSidebar';
 import Card from '../components/Card';
 
-export default function DashboardPage({ onNavigate, onLogout, userName, userRole }) {
+export default function DashboardPage({ onNavigate, onLogout, onUpdateUser, userName, userRole, user }) {
   const [activeMenu, setActiveMenu] = useState('dashboard');
   const [devices, setDevices] = useState([]);
   const [totalUsage, setTotalUsage] = useState(0);
@@ -37,6 +37,16 @@ export default function DashboardPage({ onNavigate, onLogout, userName, userRole
           status: d.approvalStatus || (d.active ? 'APPROVED' : 'PENDING'),
         })) : []);
         setTotalUsage(typeof total === 'number' ? total : 0);
+
+        // If user info is partial (missing firstName), fetch profile to hydrate state
+        if (!user?.firstName && onUpdateUser) {
+          userService.getProfile().then(response => {
+            const data = response.user || response;
+            if (data && data.firstName) {
+              onUpdateUser(data);
+            }
+          }).catch(() => {});
+        }
       } catch (err) {
         console.error('Failed to fetch dashboard data:', err);
       } finally {
@@ -44,7 +54,7 @@ export default function DashboardPage({ onNavigate, onLogout, userName, userRole
       }
     };
     fetchData();
-  }, []);
+  }, [user, onUpdateUser]);
 
   const handleMenuNavigate = (key) => {
     setActiveMenu(key);

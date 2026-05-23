@@ -19,6 +19,9 @@ export default function RegisterPage({ onNavigate, onRegister }) {
     lastName: '',
     schoolId: '',
     email: '',
+    course: '',
+    year: '',
+    contactNumber: '',
     role: 'Student',
     password: '',
     confirmPassword: '',
@@ -48,6 +51,10 @@ export default function RegisterPage({ onNavigate, onRegister }) {
     } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
       newErrors.email = 'Email is invalid';
     }
+    if (!formData.course.trim()) newErrors.course = 'Course is required';
+    if (!formData.year.trim()) newErrors.year = 'Year level is required';
+    if (!formData.contactNumber.trim()) newErrors.contactNumber = 'Contact number is required';
+    
     if (!formData.password) {
       newErrors.password = 'Password is required';
     } else if (formData.password.length < 8) {
@@ -70,12 +77,25 @@ export default function RegisterPage({ onNavigate, onRegister }) {
     setIsLoading(true);
     setFormError('');
     try {
-      const data = await authService.register({
+      const response = await authService.register({
         schoolId: formData.schoolId,
         password: formData.password,
         email: formData.email,
+        firstName: formData.firstName,
+        lastName: formData.lastName,
+        course: formData.course,
+        year: formData.year,
+        contactNumber: formData.contactNumber,
+        role: formData.role,
       });
-      onRegister(data);
+
+      // Pass the complete user data to App state, 
+      // prioritizing server response but falling back to form data
+      const userData = response.user || response;
+      onRegister({
+        ...formData,
+        ...userData
+      });
       onNavigate('dashboard');
     } catch (err) {
       const msg = err.response?.data?.message || 'Registration failed. Please try again.';
@@ -214,6 +234,75 @@ export default function RegisterPage({ onNavigate, onRegister }) {
                 {errors.email && (
                   <p style={{ color: '#ff4444', fontFamily: FONTS.primary, fontSize: '12px', marginTop: '6px', marginBottom: 0 }}>
                     {errors.email}
+                  </p>
+                )}
+              </div>
+
+              {/* Course & Year Level */}
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+                <div>
+                  <label style={{ display: 'block', color: COLORS.textHeading, fontFamily: FONTS.primary, fontSize: '14px', fontWeight: 'bold', marginBottom: '8px' }}>
+                    Course
+                  </label>
+                  <input
+                    type="text"
+                    name="course"
+                    placeholder="e.g. BSCS"
+                    value={formData.course}
+                    onChange={handleChange}
+                    onFocus={() => setFocusedField('course')}
+                    onBlur={() => setFocusedField(null)}
+                    style={inputStyle('course')}
+                  />
+                  {errors.course && (
+                    <p style={{ color: '#ff4444', fontFamily: FONTS.primary, fontSize: '12px', marginTop: '6px', marginBottom: 0 }}>
+                      {errors.course}
+                    </p>
+                  )}
+                </div>
+                <div>
+                  <label style={{ display: 'block', color: COLORS.textHeading, fontFamily: FONTS.primary, fontSize: '14px', fontWeight: 'bold', marginBottom: '8px' }}>
+                    Year Level
+                  </label>
+                  <select
+                    name="year"
+                    value={formData.year}
+                    onChange={handleChange}
+                    style={inputStyle('year')}
+                  >
+                    <option value="">Select Year</option>
+                    <option value="1st Year">1st Year</option>
+                    <option value="2nd Year">2nd Year</option>
+                    <option value="3rd Year">3rd Year</option>
+                    <option value="4th Year">4th Year</option>
+                    <option value="5th Year">5th Year</option>
+                  </select>
+                  {errors.year && (
+                    <p style={{ color: '#ff4444', fontFamily: FONTS.primary, fontSize: '12px', marginTop: '6px', marginBottom: 0 }}>
+                      {errors.year}
+                    </p>
+                  )}
+                </div>
+              </div>
+
+              {/* Contact Number */}
+              <div>
+                <label style={{ display: 'block', color: COLORS.textHeading, fontFamily: FONTS.primary, fontSize: '14px', fontWeight: 'bold', marginBottom: '8px' }}>
+                  Contact Number
+                </label>
+                <input
+                  type="text"
+                  name="contactNumber"
+                  placeholder="e.g. 09123456789"
+                  value={formData.contactNumber}
+                  onChange={handleChange}
+                  onFocus={() => setFocusedField('contactNumber')}
+                  onBlur={() => setFocusedField(null)}
+                  style={inputStyle('contactNumber')}
+                />
+                {errors.contactNumber && (
+                  <p style={{ color: '#ff4444', fontFamily: FONTS.primary, fontSize: '12px', marginTop: '6px', marginBottom: 0 }}>
+                    {errors.contactNumber}
                   </p>
                 )}
               </div>
