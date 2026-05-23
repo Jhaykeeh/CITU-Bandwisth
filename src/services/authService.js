@@ -4,21 +4,49 @@ export const authService = {
   // Register user
   register: async (userData) => {
     const response = await api.post('/auth/register', userData);
-    if (response.data.token) {
-      localStorage.setItem('token', response.data.token);
-      localStorage.setItem('user', JSON.stringify(response.data));
+    const data = response.data;
+    if (data.token) {
+      localStorage.setItem('token', data.token);
+      // Store user data - handle both {token, user} and {token, ...user} structures
+      const userToStore = data.user || data;
+      localStorage.setItem('user', JSON.stringify(userToStore));
     }
-    return response.data;
+    return data;
   },
 
   // Login
   login: async (credentials) => {
     const response = await api.post('/auth/login', credentials);
-    if (response.data.token) {
-      localStorage.setItem('token', response.data.token);
-      localStorage.setItem('user', JSON.stringify(response.data));
+    const data = response.data;
+    if (data.token) {
+      localStorage.setItem('token', data.token);
+      
+      // Store user data - handle both {token, user} and {token, ...user} structures
+      let userToStore = data.user || data;
+      
+      // If the login response is missing profile details (like firstName), 
+      // fetch the full profile immediately to ensure consistency
+      if (!userToStore.firstName) {
+        try {
+          const profileResponse = await api.get('/users/profile');
+          const profileData = profileResponse.data.user || profileResponse.data;
+          userToStore = { ...userToStore, ...profileData };
+        } catch (error) {
+          console.error('Login success but profile fetch failed:', error);
+        }
+      }
+      
+      localStorage.setItem('user', JSON.stringify(userToStore));
+      
+      // Update the data object to return the full user to the caller (LoginPage/App)
+      if (data.user) {
+        data.user = userToStore;
+      } else {
+        // If data was flat, merge profile fields into it
+        Object.assign(data, userToStore);
+      }
     }
-    return response.data;
+    return data;
   },
 
   // Logout
@@ -31,6 +59,14 @@ export const authService = {
   getCurrentUser: () => {
     const user = localStorage.getItem('user');
     return user ? JSON.parse(user) : null;
+  },
+
+  // Update stored user data
+  updateStoredUser: (userData) => {
+    const currentUser = authService.getCurrentUser() || {};
+    const updatedUser = { ...currentUser, ...userData };
+    localStorage.setItem('user', JSON.stringify(updatedUser));
+    return updatedUser;
   },
 
   // Check if user is logged in

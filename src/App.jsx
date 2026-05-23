@@ -2,8 +2,8 @@
  * App.jsx - Main Application Router
  */
 
-import { useState } from 'react';
-import { authService } from './services/authService';
+import { useState, useEffect } from 'react';
+import { authService, userService } from './services/authService';
 import LandingPage from './pages/LandingPage';
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
@@ -18,13 +18,19 @@ import AdminDashboardPage from './pages/AdminDashboardPage';
 
 function getInitialUser() {
   if (!authService.isAuthenticated()) {
-    return { schoolId: '', role: '' };
+    return { schoolId: '', role: '', firstName: '', lastName: '', email: '', course: '', year: '', contactNumber: '' };
   }
 
   const user = authService.getCurrentUser();
   return {
     schoolId: user?.schoolId || '',
     role: user?.role === 'ADMIN' ? 'admin' : 'student',
+    firstName: user?.firstName || '',
+    lastName: user?.lastName || '',
+    email: user?.email || '',
+    course: user?.course || '',
+    year: user?.year || '',
+    contactNumber: user?.contactNumber || '',
   };
 }
 
@@ -34,8 +40,23 @@ export default function App() {
     return 'landing';
   });
   const [isLoggedIn, setIsLoggedIn] = useState(authService.isAuthenticated());
-  const [userName, setUserName] = useState(() => getInitialUser().schoolId);
-  const [userRole, setUserRole] = useState(() => getInitialUser().role);
+  const [user, setUser] = useState(getInitialUser);
+
+  // Auto-hydrate profile if logged in but data is missing
+  useEffect(() => {
+    if (isLoggedIn && !user.firstName) {
+      userService.getProfile()
+        .then(response => {
+          const userData = response.user || response;
+          if (userData && (userData.firstName || userData.lastName)) {
+            handleUpdateUser(userData);
+          }
+        })
+        .catch(() => {
+          // Silent fail - profile might not be available or token expired
+        });
+    }
+  }, [isLoggedIn]);
 
   // Navigation
   const navigate = (page) => {
@@ -44,27 +65,61 @@ export default function App() {
   };
 
   // Login handler
-  const handleLogin = (userData) => {
+  const handleLogin = (data) => {
     setIsLoggedIn(true);
-    setUserName(userData.schoolId);
-    setUserRole(userData.role === 'ADMIN' ? 'admin' : 'student');
+    // Handle both flat and nested user data
+    const userData = data.user || data;
+    setUser({
+      schoolId: userData.schoolId || '',
+      role: userData.role === 'ADMIN' ? 'admin' : 'student',
+      firstName: userData.firstName || '',
+      lastName: userData.lastName || '',
+      email: userData.email || '',
+      course: userData.course || '',
+      year: userData.year || '',
+      contactNumber: userData.contactNumber || '',
+    });
     navigate('dashboard');
   };
 
   // Register handler
-  const handleRegister = (userData) => {
+  const handleRegister = (data) => {
     setIsLoggedIn(true);
-    setUserName(userData.schoolId);
-    setUserRole('student');
+    // Handle both flat and nested user data
+    const userData = data.user || data;
+    setUser({
+      schoolId: userData.schoolId || '',
+      role: 'student',
+      firstName: userData.firstName || '',
+      lastName: userData.lastName || '',
+      email: userData.email || '',
+      course: userData.course || '',
+      year: userData.year || '',
+      contactNumber: userData.contactNumber || '',
+    });
     navigate('dashboard');
+  };
+
+  // Update user profile handler
+  const handleUpdateUser = (updatedData) => {
+    const fullUpdatedUser = authService.updateStoredUser(updatedData);
+    setUser({
+      schoolId: fullUpdatedUser.schoolId || '',
+      role: fullUpdatedUser.role === 'ADMIN' ? 'admin' : 'student',
+      firstName: fullUpdatedUser.firstName || '',
+      lastName: fullUpdatedUser.lastName || '',
+      email: fullUpdatedUser.email || '',
+      course: fullUpdatedUser.course || '',
+      year: fullUpdatedUser.year || '',
+      contactNumber: fullUpdatedUser.contactNumber || '',
+    });
   };
 
   // Logout
   const handleLogout = () => {
     authService.logout();
     setIsLoggedIn(false);
-    setUserName('');
-    setUserRole('');
+    setUser({ schoolId: '', role: '', firstName: '', lastName: '', email: '', course: '', year: '', contactNumber: '' });
     navigate('landing');
   };
 
@@ -75,10 +130,14 @@ export default function App() {
 
   // ADMIN GUARD
   const requireAdmin = (component) => {
-    return userRole === 'admin' ? component : (navigate('dashboard'), null);
+    return user.role === 'admin' ? component : (navigate('dashboard'), null);
   };
 
   const renderPage = () => {
+    const userName = user.schoolId;
+    const userRole = user.role;
+    const userDisplayName = user.firstName ? `${user.firstName} ${user.lastName}` : user.schoolId;
+
     switch (currentPage) {
 
       case 'landing':
@@ -104,8 +163,10 @@ export default function App() {
           <DashboardPage
             onNavigate={navigate}
             onLogout={handleLogout}
-            userName={userName}
+            onUpdateUser={handleUpdateUser}
+            userName={userDisplayName}
             userRole={userRole}
+            user={user}
           />
         );
 
@@ -114,8 +175,10 @@ export default function App() {
           <MyAccountPage
             onNavigate={navigate}
             onLogout={handleLogout}
-            userName={userName}
+            onUpdateUser={handleUpdateUser}
+            userName={userDisplayName}
             userRole={userRole}
+            user={user}
           />
         );
 
@@ -124,7 +187,7 @@ export default function App() {
           <BandwidthMonitorPage
             onNavigate={navigate}
             onLogout={handleLogout}
-            userName={userName}
+            userName={userDisplayName}
             userRole={userRole}
           />
         );
@@ -134,7 +197,7 @@ export default function App() {
           <WifiRegistrationPage
             onNavigate={navigate}
             onLogout={handleLogout}
-            userName={userName}
+            userName={userDisplayName}
             userRole={userRole}
           />
         );

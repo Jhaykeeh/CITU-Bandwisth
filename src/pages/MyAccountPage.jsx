@@ -12,7 +12,7 @@ import { COLORS, FONTS } from '../constants/theme';
 import DashboardSidebar from '../components/DashboardSidebar';
 import Card from '../components/Card';
 
-export default function MyAccount({ onNavigate, onLogout, userName }) {
+export default function MyAccount({ onNavigate, onLogout, onUpdateUser, userName, user }) {
   const [activeMenu, setActiveMenu] = useState('my-account');
   const [editingProfile, setEditingProfile] = useState(false);
   const [editingPassword, setEditingPassword] = useState(false);
@@ -22,24 +22,83 @@ export default function MyAccount({ onNavigate, onLogout, userName }) {
   const [loadingProfile, setLoadingProfile] = useState(true);
 
   const [profile, setProfile] = useState({
-    firstName: userName || 'User',
-    lastName: '',
-    email: '',
-    studentId: userName || '',
-    course: '',
-    year: '',
-    contactNumber: '',
+    firstName: user?.firstName || '',
+    lastName: user?.lastName || '',
+    email: user?.email || '',
+    studentId: user?.schoolId || '',
+    course: user?.course || '',
+    year: user?.year || '',
+    contactNumber: user?.contactNumber || '',
   });
 
   const [profileDraft, setProfileDraft] = useState({ ...profile });
 
+  // Update local state when user prop changes (e.g. after hydration in App.jsx)
+  useEffect(() => {
+    if (user && (user.firstName || user.schoolId)) {
+      setProfile(prev => {
+        // Only update if the values are different and non-empty
+        const updates = {};
+        if (user.firstName && user.firstName !== prev.firstName) updates.firstName = user.firstName;
+        if (user.lastName && user.lastName !== prev.lastName) updates.lastName = user.lastName;
+        if (user.email && user.email !== prev.email) updates.email = user.email;
+        if (user.schoolId && user.schoolId !== prev.studentId) {
+          updates.schoolId = user.schoolId;
+          updates.studentId = user.schoolId;
+        }
+        if (user.course && user.course !== prev.course) updates.course = user.course;
+        if (user.year && user.year !== prev.year) updates.year = user.year;
+        if (user.contactNumber && user.contactNumber !== prev.contactNumber) updates.contactNumber = user.contactNumber;
+
+        if (Object.keys(updates).length === 0) return prev;
+
+        const newProfile = { ...prev, ...updates };
+        if (!editingProfile) {
+          setProfileDraft(newProfile);
+        }
+        return newProfile;
+      });
+    }
+  }, [user, editingProfile]);
+
   useEffect(() => {
     userService.getProfile()
-      .then(data => {
-        if (data && data.email) {
-          setProfile(prev => ({ ...prev, email: data.email }));
-          setProfileDraft(prev => ({ ...prev, email: data.email }));
-        }
+      .then(response => {
+        // Handle both flat and nested user data from profile response
+        const data = response.user || response;
+        if (data) {
+           // Create a clean object with only the fields that are actually in the response
+           const apiData = {};
+           if (data.firstName) apiData.firstName = data.firstName;
+           if (data.lastName) apiData.lastName = data.lastName;
+           if (data.email) apiData.email = data.email;
+           if (data.schoolId || data.studentId) apiData.schoolId = data.schoolId || data.studentId;
+           if (data.course) apiData.course = data.course;
+           if (data.year) apiData.year = data.year;
+           if (data.contactNumber) apiData.contactNumber = data.contactNumber;
+
+           // Update local profile state by merging with existing state to avoid clearing fields
+           setProfile(prev => {
+             const newProfile = {
+               ...prev,
+               ...apiData,
+               // Ensure studentId is kept in sync with schoolId
+               studentId: apiData.schoolId || prev.studentId
+             };
+             
+             // Update draft if not currently editing
+             if (!editingProfile) {
+               setProfileDraft(newProfile);
+             }
+             
+             return newProfile;
+           });
+
+           // Sync to global App state and localStorage
+           if (onUpdateUser && Object.keys(apiData).length > 0) {
+             onUpdateUser(apiData);
+           }
+         }
       })
       .catch(() => {})
       .finally(() => setLoadingProfile(false));
@@ -71,8 +130,29 @@ export default function MyAccount({ onNavigate, onLogout, userName }) {
   const handleProfileSave = async () => {
     setSavingProfile(true);
     try {
-      await userService.updateProfile({ email: profileDraft.email });
-      setProfile({ ...profileDraft });
+      // Prepare data for API (using schoolId instead of studentId)
+      const updateData = {
+        firstName: profileDraft.firstName,
+        lastName: profileDraft.lastName,
+        email: profileDraft.email,
+        course: profileDraft.course,
+        year: profileDraft.year,
+        contactNumber: profileDraft.contactNumber,
+      };
+
+      await userService.updateProfile(updateData);
+      
+      const newProfile = { ...profileDraft };
+      setProfile(newProfile);
+      
+      // Sync to global state
+      if (onUpdateUser) {
+        onUpdateUser({
+          ...updateData,
+          schoolId: profile.studentId // Ensure schoolId is preserved
+        });
+      }
+
       setEditingProfile(false);
       setSuccessMsg('Profile updated successfully!');
     } catch {
