@@ -77,7 +77,9 @@ export default function RegisterPage({ onNavigate, onRegister }) {
     setIsLoading(true);
     setFormError('');
     try {
-      const response = await authService.register({
+      const data = await authService.register({
+        firstName: formData.firstName,
+        lastName: formData.lastName,
         schoolId: formData.schoolId,
         password: formData.password,
         email: formData.email,
