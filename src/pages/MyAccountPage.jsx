@@ -12,7 +12,7 @@ import { COLORS, FONTS } from '../constants/theme';
 import DashboardSidebar from '../components/DashboardSidebar';
 import Card from '../components/Card';
 
-export default function MyAccount({ onNavigate, onLogout, userName }) {
+export default function MyAccount({ onNavigate, onLogout, onUpdateUser, userName, user }) {
   const [activeMenu, setActiveMenu] = useState('my-account');
   const [editingProfile, setEditingProfile] = useState(false);
   const [editingPassword, setEditingPassword] = useState(false);
@@ -22,17 +22,18 @@ export default function MyAccount({ onNavigate, onLogout, userName }) {
   const [loadingProfile, setLoadingProfile] = useState(true);
 
   const [profile, setProfile] = useState({
-    firstName: userName || 'User',
-    lastName: '',
-    email: '',
-    studentId: userName || '',
-    course: '',
-    year: '',
-    contactNumber: '',
+    firstName: user?.firstName || '',
+    lastName: user?.lastName || '',
+    email: user?.email || '',
+    studentId: user?.schoolId || '',
+    course: user?.course || '',
+    year: user?.year || '',
+    contactNumber: user?.contactNumber || '',
   });
 
   const [profileDraft, setProfileDraft] = useState({ ...profile });
 
+  // Update local state when user prop changes (e.g. after hydration in App.jsx)
   useEffect(() => {
     const user = authService.getCurrentUser();
     if (user) {
@@ -78,6 +79,59 @@ export default function MyAccount({ onNavigate, onLogout, userName }) {
             contactNumber: data.contactNumber || user?.contactNumber || '',
           });
         }
+        if (user.course && user.course !== prev.course) updates.course = user.course;
+        if (user.year && user.year !== prev.year) updates.year = user.year;
+        if (user.contactNumber && user.contactNumber !== prev.contactNumber) updates.contactNumber = user.contactNumber;
+
+        if (Object.keys(updates).length === 0) return prev;
+
+        const newProfile = { ...prev, ...updates };
+        if (!editingProfile) {
+          setProfileDraft(newProfile);
+        }
+        return newProfile;
+      });
+    }
+  }, [user, editingProfile]);
+
+  useEffect(() => {
+    userService.getProfile()
+      .then(response => {
+        // Handle both flat and nested user data from profile response
+        const data = response.user || response;
+        if (data) {
+           // Create a clean object with only the fields that are actually in the response
+           const apiData = {};
+           if (data.firstName) apiData.firstName = data.firstName;
+           if (data.lastName) apiData.lastName = data.lastName;
+           if (data.email) apiData.email = data.email;
+           if (data.schoolId || data.studentId) apiData.schoolId = data.schoolId || data.studentId;
+           if (data.course) apiData.course = data.course;
+           if (data.year) apiData.year = data.year;
+           if (data.contactNumber) apiData.contactNumber = data.contactNumber;
+
+           // Update local profile state by merging with existing state to avoid clearing fields
+           setProfile(prev => {
+             const newProfile = {
+               ...prev,
+               ...apiData,
+               // Ensure studentId is kept in sync with schoolId
+               studentId: apiData.schoolId || prev.studentId
+             };
+             
+             // Update draft if not currently editing
+             if (!editingProfile) {
+               setProfileDraft(newProfile);
+             }
+             
+             return newProfile;
+           });
+
+           // Sync to global App state and localStorage
+           if (onUpdateUser && Object.keys(apiData).length > 0) {
+             onUpdateUser(apiData);
+           }
+         }
       })
       .catch(() => {})
       .finally(() => setLoadingProfile(false));
